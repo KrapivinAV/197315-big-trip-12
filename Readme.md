@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Александр Крапивин](https://up.htmlacademy.ru/ecmascript/12/user/197315).
-* Наставник: `Неизвестно`.
+* Наставник: [Алексей Михеев](https://htmlacademy.ru/profile/id454457).
 
 ---
 
