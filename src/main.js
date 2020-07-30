@@ -355,44 +355,44 @@ const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
-const TripMainElement = document.querySelector(`.trip-main`);
+const tripMainElement = document.querySelector(`.trip-main`);
 
-render(TripMainElement, createTripInfoContainerTemplate(), `afterbegin`);
+render(tripMainElement, createTripInfoContainerTemplate(), `afterbegin`);
 
-const TripInfoElement = TripMainElement.querySelector(`.trip-info`);
+const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
-render(TripInfoElement, createTripInfoMainTemplate(), `beforeend`);
-render(TripInfoElement, createTripInfoCostTemplate(), `beforeend`);
+render(tripInfoElement, createTripInfoMainTemplate(), `beforeend`);
+render(tripInfoElement, createTripInfoCostTemplate(), `beforeend`);
 
-const TripControlsElement = TripMainElement.querySelector(`.trip-controls`);
-const TripControlsFirstHeaderElement = TripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
+const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
+const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
 
-render(TripControlsFirstHeaderElement, createMainNavTemplate(), `afterend`);
-render(TripControlsElement, createFilterTemplate(), `beforeend`);
+render(tripControlsFirstHeaderElement, createMainNavTemplate(), `afterend`);
+render(tripControlsElement, createFilterTemplate(), `beforeend`);
 
-const TripEventsElement = document.querySelector(`.trip-events`);
+const tripEventsElement = document.querySelector(`.trip-events`);
 
-render(TripEventsElement, createSorterTemplate(), `beforeend`);
-render(TripEventsElement, createEventEditFormTemplate(), `beforeend`);
-render(TripEventsElement, createDaysTemplate(), `beforeend`);
+render(tripEventsElement, createSorterTemplate(), `beforeend`);
+render(tripEventsElement, createEventEditFormTemplate(), `beforeend`);
+render(tripEventsElement, createDaysTemplate(), `beforeend`);
 
-const EventEditFormElement = TripEventsElement.querySelector(`.event--edit`);
+const eventEditFormElement = tripEventsElement.querySelector(`.event--edit`);
 
-render(EventEditFormElement, createEventEditFormHeaderTemplate(), `beforeend`);
-render(EventEditFormElement, createEventEditFormDetailsTemplate(), `beforeend`);
+render(eventEditFormElement, createEventEditFormHeaderTemplate(), `beforeend`);
+render(eventEditFormElement, createEventEditFormDetailsTemplate(), `beforeend`);
 
-const EventEditFormDetailsElement = EventEditFormElement.querySelector(`.event__details`);
+const eventEditFormDetailsElement = eventEditFormElement.querySelector(`.event__details`);
 
-render(EventEditFormDetailsElement, createEventEditFormDetailsOfferTemplate(), `beforeend`);
-render(EventEditFormDetailsElement, createEventEditFormDetailsDestinationTemplate(), `beforeend`);
+render(eventEditFormDetailsElement, createEventEditFormDetailsOfferTemplate(), `beforeend`);
+render(eventEditFormDetailsElement, createEventEditFormDetailsDestinationTemplate(), `beforeend`);
 
-const EventDaysElement = TripEventsElement.querySelector(`.trip-days`);
+const eventDaysElement = tripEventsElement.querySelector(`.trip-days`);
 
-render(EventDaysElement, createDayTemplate(), `beforeend`);
+render(eventDaysElement, createDayTemplate(), `beforeend`);
 
-const EventDayElement = EventDaysElement.querySelector(`.day`);
-const EventListElement = EventDayElement.querySelector(`.trip-events__list`);
+const eventDayElement = eventDaysElement.querySelector(`.day`);
+const eventListElement = eventDayElement.querySelector(`.trip-events__list`);
 
 for (let i = 0; i < TASK_COUNT; i++) {
-  render(EventListElement, createEventTemplate(), `beforeend`);
+  render(eventListElement, createEventTemplate(), `beforeend`);
 }
