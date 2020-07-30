@@ -365,7 +365,7 @@ render(TripInfoElement, createTripInfoMainTemplate(), `beforeend`);
 render(TripInfoElement, createTripInfoCostTemplate(), `beforeend`);
 
 const TripControlsElement = TripMainElement.querySelector(`.trip-controls`);
-const TripControlsFirstHeaderElement = TripControlsElement.querySelector(`.trip-controls h2`); //найдет первый
+const TripControlsFirstHeaderElement = TripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
 
 render(TripControlsFirstHeaderElement, createMainNavTemplate(), `afterend`);
 render(TripControlsElement, createFilterTemplate(), `beforeend`);
