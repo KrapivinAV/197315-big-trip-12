@@ -54,8 +54,7 @@ const eventDaysElement = tripEventsElement.querySelector(`.trip-days`);
 
 render(eventDaysElement, createDayTemplate());
 
-const eventDayElement = eventDaysElement.querySelector(`.day`);
-const eventListElement = eventDayElement.querySelector(`.trip-events__list`);
+const eventListElement = eventDaysElement.querySelector(`.trip-events__list`);
 
 for (let i = 0; i < TASK_COUNT; i++) {
   render(eventListElement, createEventTemplate());
