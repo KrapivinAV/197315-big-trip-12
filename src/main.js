@@ -12,8 +12,11 @@ import {createEventEditFormDetailsDestinationTemplate} from "./view/event-edit-f
 import {createDaysTemplate} from "./view/days.js";
 import {createDayTemplate} from "./view/day.js";
 import {createEventTemplate} from "./view/event.js";
+import {generateEvent} from "./mock/event.js";
 
-const TASK_COUNT = 3;
+const EVENT_COUNT = 20;
+
+const events = new Array(EVENT_COUNT).fill().map(generateEvent);
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
@@ -56,6 +59,6 @@ render(eventDaysElement, createDayTemplate());
 
 const eventListElement = eventDaysElement.querySelector(`.trip-events__list`);
 
-for (let i = 0; i < TASK_COUNT; i++) {
-  render(eventListElement, createEventTemplate());
+for (let i = 0; i < EVENT_COUNT; i++) {
+  render(eventListElement, createEventTemplate(events[i]));
 }

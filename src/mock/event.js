@@ -1,96 +1,79 @@
 import {routeParameters} from "../constants.js";
 import {getRandomInteger} from "../utils.js";
 
+const {arrivals, vehicles, places, descriptionPool, msInOneDay, maxDaysGap, maxPrice, maxPhotoQuantity} = routeParameters;
+
 let waypointTypeCategory;
 let waypointTypeIndex;
 
 const generateWaypointType = () => {
   waypointTypeCategory = getRandomInteger(0, 1);
   waypointTypeIndex = waypointTypeCategory ?
-    getRandomInteger(0, routeParameters.vehicles.length - 1) :
-    getRandomInteger(0, routeParameters.arrivals.length - 1);
+    getRandomInteger(0, vehicles.length - 1) :
+    getRandomInteger(0, arrivals.length - 1);
 
   return waypointTypeCategory ?
-    `${routeParameters.vehicles[waypointTypeIndex].name} to` :
-    `${routeParameters.arrivals[waypointTypeIndex].name} in`;
+    vehicles[waypointTypeIndex].name :
+    arrivals[waypointTypeIndex].name;
 };
 
 const generateWaypoint = () => {
-  const index = getRandomInteger(0, routeParameters.places.length - 1);
+  const index = getRandomInteger(0, places.length - 1);
 
-  return routeParameters.places[index];
+  return places[index];
 };
 
 const generateOfferSet = (offerSet) => {
-  const index = getRandomInteger(0, offerSet.length - 1);
+  const index = getRandomInteger(0, offerSet.length);
 
-  return new Array(index).fill(() => {
-
-  });
+  return new Set(new Array(index).fill().map(() => offerSet[getRandomInteger(0, offerSet.length - 1)]));
 };
 
 const generateOffers = (category, index) => {
   return category ?
-    generateOfferSet(routeParameters.vehicles[index].offerSet) :
-    generateOfferSet(routeParameters.arrivals[index].offerSet);
+    generateOfferSet(vehicles[index].offerSet) :
+    generateOfferSet(arrivals[index].offerSet);
 };
 
-const generateDate = () => {
-  // Когда в руках молоток, любая проблема - гвоздь.
-  // Вот и для генерации случайного булевого значения
-  // можно использовать "функцию из интернета".
-  // Ноль - ложь, один - истина. Для верности приводим
-  // к булевому типу с помощью Boolean
-  const isDate = Boolean(getRandomInteger(0, 1));
-
-  if (!isDate) {
-    return null;
-  }
-
-  const maxDaysGap = 7;
-  const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
-  const currentDate = new Date();
-
-  // По заданию дедлайн у задачи устанавливается без учёта времеми,
-  // но объект даты без времени завести нельзя,
-  // поэтому будем считать срок у всех задач -
-  // это 23:59:59 установленной даты
-  currentDate.setHours(23, 59, 59, 999);
-
-  currentDate.setDate(currentDate.getDate() + daysGap);
-
-  return new Date(currentDate);
+const generateEventStartPoint = (time) => {
+  return new Date(getRandomInteger(time - maxDaysGap * msInOneDay, time + maxDaysGap * msInOneDay));
 };
 
-const generateRepeating = () => {
-  return {
-    mo: false,
-    tu: false,
-    we: Boolean(getRandomInteger(0, 1)),
-    th: false,
-    fr: Boolean(getRandomInteger(0, 1)),
-    sa: false,
-    su: false
-  };
+const generateEventEndPoint = (time, start) => {
+  return new Date(getRandomInteger(start + 1, time + maxDaysGap * msInOneDay));
 };
 
-const getRandomColor = () => {
-  const randomIndex = getRandomInteger(0, COLORS.length - 1);
+const generateDescription = () => {
+  const quantity = getRandomInteger(1, descriptionPool.length);
 
-  return COLORS[randomIndex];
+  return new Set(new Array(quantity).fill().map(() => descriptionPool[getRandomInteger(0, descriptionPool.length - 1)]));
 };
 
-export const generateTask = () => {
+const generatePhotos = () => {
+  const quantity = getRandomInteger(1, maxPhotoQuantity);
+
+  return new Set(new Array(quantity).fill().map(() => `http://picsum.photos/248/152?r=${Math.random()}`));
+};
+
+export const generateEvent = () => {
   const waypointType = generateWaypointType();
   const waypoint = generateWaypoint();
-  const offers = generateOffers(waypointTypeCategory, waypointTypeIndex);
+  const offers = Array.from(generateOffers(waypointTypeCategory, waypointTypeIndex));
+  const currentTime = Date.now();
+  const eventStartPoint = generateEventStartPoint(currentTime);
+  const eventEndPoint = generateEventEndPoint(currentTime, eventStartPoint.getTime());
+  const description = Array.from(generateDescription()).join(`. `);
+  const photos = Array.from(generatePhotos());
+  const price = getRandomInteger(1, maxPrice);
 
   return {
     waypointType,
     waypoint,
     offers,
-    color: getRandomColor(),
-    isArchive: Boolean(getRandomInteger(0, 1)),
-    isFavorite: Boolean(getRandomInteger(0, 1))
+    eventStartPoint,
+    eventEndPoint,
+    description,
+    photos,
+    price
   };
 };
