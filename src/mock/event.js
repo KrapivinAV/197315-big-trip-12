@@ -1,4 +1,4 @@
-import {routeParameters} from "../constants.js";
+import {routeParameters} from "../route-parameters.js";
 import {getRandomInteger} from "../utils.js";
 
 const {arrivals, vehicles, places, descriptionPool, msInOneDay, maxDaysGap, maxPrice, maxPhotoQuantity} = routeParameters;
