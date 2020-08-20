@@ -20,7 +20,9 @@ import {generateEvent} from "./mock/event.js";
 const EVENT_COUNT = 20;
 const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
-const events = new Array(EVENT_COUNT).fill().map(generateEvent).sort((a, b) => a.eventStartPoint.getTime() - b.eventStartPoint.getTime());
+const events = new Array(EVENT_COUNT).fill().map(generateEvent);
+
+/*
 const groupMarks = Array.from(new Set(events.map((item) => item.eventStartPoint.toLocaleString(`en-US`, {year: `numeric`, month: `numeric`, day: `numeric`}))));
 
 const eventsGroups = [];
@@ -31,6 +33,24 @@ const firstEvent = eventsGroups[0].shift();
 if (!eventsGroups[0].length) {
   eventsGroups.shift();
 }
+*/
+
+const eventsClone = events.slice().sort((a, b) => a.eventStartPoint.getTime() - b.eventStartPoint.getTime());
+const eventsGroups2 = new Map();
+
+while (eventsClone.length > 0) {
+  const dayStart = eventsClone[0].eventStartPoint.setHours(0, 0, 0, 0);
+  const dayEnd = eventsClone[0].eventStartPoint.setHours(23, 59, 59, 999);
+  const daySet = [];
+  for (let i = eventsClone.length - 1; i >= 0; i--) {
+    const eventStartTime = eventsClone[i].eventStartPoint.getTime();
+    if (eventStartTime >= dayStart && eventStartTime <= dayEnd) {
+      daySet.push(eventsClone.splice(i, 1)[0]);
+    }
+  }
+  eventsGroups2.set(daySet[0].eventStartPoint.toLocaleString(`en-US`, {month: `short`, day: `numeric`}), daySet);
+}
+console.log(eventsGroups2);
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
