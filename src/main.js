@@ -13,12 +13,9 @@ import {createEventEditFormDetailsDestinationTemplate} from "./view/event-edit-f
 import {createEventEditFormDetailsDestinationPhotoTemplate} from "./view/photo.js";
 import {createDaysTemplate} from "./view/days.js";
 import {createDayTemplate} from "./view/day.js";
-import {createEventTemplate} from "./view/event.js";
-import {createEventPreviewOffer} from "./view/event-preview-offer.js";
 import {generateEvent} from "./mock/event.js";
 
 const EVENT_COUNT = 20;
-const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
 
@@ -36,7 +33,8 @@ if (!eventsGroups[0].length) {
 */
 
 const eventsClone = events.slice().sort((a, b) => a.eventStartPoint.getTime() - b.eventStartPoint.getTime());
-const eventsGroups2 = new Map();
+const firstEvent = eventsClone[0];
+const eventsGroups = new Map();
 
 while (eventsClone.length > 0) {
   const dayStart = eventsClone[0].eventStartPoint.setHours(0, 0, 0, 0);
@@ -48,9 +46,8 @@ while (eventsClone.length > 0) {
       daySet.push(eventsClone.splice(i, 1)[0]);
     }
   }
-  eventsGroups2.set(daySet[0].eventStartPoint.toLocaleString(`en-US`, {month: `short`, day: `numeric`}), daySet);
+  eventsGroups.set(daySet[0].eventStartPoint.toLocaleString(`en-US`, {month: `short`, day: `numeric`}), daySet);
 }
-console.log(eventsGroups2);
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
@@ -100,6 +97,7 @@ for (let i = 0; i < firstEvent.offers.length; i++) {
 
 const eventDaysElement = tripEventsElement.querySelector(`.trip-days`);
 
+/*
 for (let i = 0; i < eventsGroups.length; i++) {
   render(eventDaysElement, createDayTemplate(i + 1, eventsGroups[i][0].eventStartPoint.toISOString(), eventsGroups[i][0].eventStartPoint.toLocaleString(`en-US`, {month: `short`, day: `numeric`})));
   const eventListElement = eventDaysElement.querySelectorAll(`.trip-events__list`);
@@ -113,3 +111,9 @@ for (let i = 0; i < eventsGroups.length; i++) {
     }
   }
 }
+*/
+let index = 1;
+eventsGroups.forEach((eventsGroup, dayKey) => {
+  render(eventDaysElement, createDayTemplate(eventsGroup, dayKey, index));
+  index++;
+});

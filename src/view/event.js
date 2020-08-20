@@ -1,11 +1,22 @@
 import {basisConstants} from "../basis-constants.js";
+import {createEventPreviewOffer} from "./event-preview-offer.js";
 
 const {arrivals} = basisConstants;
+const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
 export const createEventTemplate = (event) => {
-  const {waypointType, waypoint, eventStartPoint, eventEndPoint, price} = event;
+  const {waypointType, waypoint, offers, eventStartPoint, eventEndPoint, price} = event;
 
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
+  const offerCount = Math.min(offers.length, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW);
+
+  const createOfferSet = () => {
+    let offerSet = ``;
+    for (let i = 0; i < offerCount; i++) {
+      offerSet += createEventPreviewOffer(offers[i]);
+    }
+    return offerSet;
+  };
 
   const generateDuration = (start, end) => {
     const difference = new Date(end - start);
@@ -40,6 +51,7 @@ export const createEventTemplate = (event) => {
 
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
+        ${createOfferSet()}
       </ul>
 
       <button class="event__rollup-btn" type="button">
