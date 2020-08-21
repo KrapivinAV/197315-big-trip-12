@@ -17,37 +17,23 @@ import {generateEvent} from "./mock/event.js";
 
 const EVENT_COUNT = 20;
 
-const events = new Array(EVENT_COUNT).fill().map(generateEvent);
-
-/*
-const groupMarks = Array.from(new Set(events.map((item) => item.eventStartPoint.toLocaleString(`en-US`, {year: `numeric`, month: `numeric`, day: `numeric`}))));
-
-const eventsGroups = [];
-for (let i = 0; i < groupMarks.length; i++) {
-  eventsGroups[i] = events.filter((item) => item.eventStartPoint.toLocaleString(`en-US`, {year: `numeric`, month: `numeric`, day: `numeric`}) === groupMarks[i]);
-}
-const firstEvent = eventsGroups[0].shift();
-if (!eventsGroups[0].length) {
-  eventsGroups.shift();
-}
-*/
-
-const eventsClone = events.slice().sort((a, b) => a.eventStartPoint.getTime() - b.eventStartPoint.getTime());
-const firstEvent = eventsClone[0];
+const events = new Array(EVENT_COUNT).fill().map(generateEvent).sort((a, b) => a.eventStartPoint.getTime() - b.eventStartPoint.getTime());
+const firstEvent = events[0];
 const eventsGroups = new Map();
 
-while (eventsClone.length > 0) {
-  const dayStart = eventsClone[0].eventStartPoint.setHours(0, 0, 0, 0);
-  const dayEnd = eventsClone[0].eventStartPoint.setHours(23, 59, 59, 999);
-  const daySet = [];
-  for (let i = eventsClone.length - 1; i >= 0; i--) {
-    const eventStartTime = eventsClone[i].eventStartPoint.getTime();
-    if (eventStartTime >= dayStart && eventStartTime <= dayEnd) {
-      daySet.push(eventsClone.splice(i, 1)[0]);
-    }
+events.forEach((event) => {
+  const dayStart = event.eventStartPoint.setHours(0, 0, 0, 0);
+
+  if (!eventsGroups.has(dayStart)) {
+    const dayEnd = event.eventStartPoint.setHours(23, 59, 59, 999);
+
+    const daySet = events.filter((item) => {
+      const eventStartTime = item.eventStartPoint.getTime();
+      return eventStartTime >= dayStart && eventStartTime <= dayEnd;
+    });
+    eventsGroups.set(dayStart, daySet);
   }
-  eventsGroups.set(daySet[0].eventStartPoint.toLocaleString(`en-US`, {month: `short`, day: `numeric`}), daySet);
-}
+});
 
 const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
@@ -112,8 +98,7 @@ for (let i = 0; i < eventsGroups.length; i++) {
   }
 }
 */
-let index = 1;
-eventsGroups.forEach((eventsGroup, dayKey) => {
+
+Array.from(eventsGroups.entries()).forEach(([dayKey, eventsGroup], index) => {
   render(eventDaysElement, createDayTemplate(eventsGroup, dayKey, index));
-  index++;
 });
