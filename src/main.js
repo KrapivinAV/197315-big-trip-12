@@ -70,16 +70,16 @@ const eventEditFormDetailsElement = eventEditFormElement.querySelector(`.event__
 if (firstEvent.offers && firstEvent.offers.length !== 0) {
   render(eventEditFormDetailsElement, createEventEditFormDetailsOfferTemplate());
   const eventAvailableOffersContainer = eventEditFormDetailsElement.querySelector(`.event__available-offers`);
-  for (let i = 0; i < firstEvent.offers.length; i++) {
-    render(eventAvailableOffersContainer, createEventEditFormOfferTemplate(firstEvent.offers[i]));
-  }
+  firstEvent.offers.forEach((offer) => {
+    render(eventAvailableOffersContainer, createEventEditFormOfferTemplate(offer));
+  });
 }
 
 render(eventEditFormDetailsElement, createEventEditFormDetailsDestinationTemplate(firstEvent.description));
 const eventPhotosTape = tripEventsElement.querySelector(`.event__photos-tape`);
-for (let i = 0; i < firstEvent.offers.length; i++) {
-  render(eventPhotosTape, createEventEditFormDetailsDestinationPhotoTemplate(firstEvent.photos[i]));
-}
+firstEvent.photos.forEach((photo) => {
+  render(eventPhotosTape, createEventEditFormDetailsDestinationPhotoTemplate(photo));
+});
 
 const eventDaysElement = tripEventsElement.querySelector(`.trip-days`);
 
@@ -100,5 +100,5 @@ for (let i = 0; i < eventsGroups.length; i++) {
 */
 
 Array.from(eventsGroups.entries()).forEach(([dayKey, eventsGroup], index) => {
-  render(eventDaysElement, createDayTemplate(eventsGroup, dayKey, index));
+  render(eventDaysElement, createDayTemplate(eventsGroup, dayKey, index + 1));
 });
