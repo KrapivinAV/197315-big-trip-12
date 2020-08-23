@@ -1,4 +1,6 @@
-export const createEventEditFormOfferTemplate = (offer) => {
+import {createElement} from "../utils.js";
+
+const createEventEditFormOfferTemplate = (offer) => {
   const {title, cost} = offer;
 
   return `<div class="event__offer-selector">
@@ -10,3 +12,27 @@ export const createEventEditFormOfferTemplate = (offer) => {
     </label>
   </div>`;
 };
+
+export default class EventEditFormOffer {
+  constructor(offer) {
+    this.offer = offer;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventEditFormOfferTemplate(this.offer);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

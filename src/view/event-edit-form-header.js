@@ -1,8 +1,9 @@
 import {basisConstants} from "../basis-constants.js";
+import {createElement} from "../utils.js";
 
 const {arrivals} = basisConstants;
 
-export const createEventEditFormHeaderTemplate = (event) => {
+const createEventEditFormHeaderTemplate = (event) => {
   const {waypointType, waypoint, eventStartPoint, eventEndPoint, price} = event;
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
 
@@ -112,3 +113,27 @@ export const createEventEditFormHeaderTemplate = (event) => {
     <button class="event__reset-btn" type="reset">Cancel</button>
   </header>`;
 };
+
+export default class EventEditFormHeader {
+  constructor(event) {
+    this.event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventEditFormHeaderTemplate(this.event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

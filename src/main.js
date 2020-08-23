@@ -1,19 +1,21 @@
-import {createTripInfoContainerTemplate} from "./view/trip-info-container.js";
-import {createTripInfoMainTemplate} from "./view/trip-info-main.js";
-import {createTripInfoCostTemplate} from "./view/trip-info-cost.js";
-import {createMainNavTemplate} from "./view/main-nav.js";
-import {createFilterTemplate} from "./view/filter.js";
-import {createSorterTemplate} from "./view/sorter.js";
-import {createEventEditFormTemplate} from "./view/event-edit-form.js";
-import {createEventEditFormHeaderTemplate} from "./view/event-edit-form-header.js";
-import {createEventEditFormDetailsTemplate} from "./view/event-edit-form-details.js";
-import {createEventEditFormDetailsOfferTemplate} from "./view/event-edit-form-details-offer.js";
-import {createEventEditFormOfferTemplate} from "./view/event-edit-form-offer.js";
-import {createEventEditFormDetailsDestinationTemplate} from "./view/event-edit-form-details-destination.js";
-import {createEventEditFormDetailsDestinationPhotoTemplate} from "./view/photo.js";
-import {createDaysTemplate} from "./view/days.js";
-import {createDayTemplate} from "./view/day.js";
+import TripInfoContainerView from "./view/trip-info-container.js";
+import TripInfoMainView from "./view/trip-info-main.js";
+import TripInfoCostView from "./view/trip-info-cost.js";
+import MainNavView from "./view/main-nav.js";
+import FilterView from "./view/filter.js";
+import SorterView from "./view/sorter.js";
+import EventEditFormView from "./view/event-edit-form.js";
+import EventEditFormHeaderView from "./view/event-edit-form-header.js";
+import EventEditFormDetailsView from "./view/event-edit-form-details.js";
+import EventEditFormDetailsOfferView from "./view/event-edit-form-details-offer.js";
+import EventEditFormOfferView from "./view/event-edit-form-offer.js";
+import EventEditFormDetailsDestinationView from "./view/event-edit-form-details-destination.js";
+import EventEditFormDetailsDestinationPhotoView from "./view/photo.js";
+import DaysView from "./view/days.js";
+import DayView from "./view/day.js";
+import EventView from "./view/event.js";
 import {generateEvent} from "./mock/event.js";
+import {renderNew, RenderPosition} from "./utils.js";
 
 const EVENT_COUNT = 20;
 
@@ -35,70 +37,56 @@ events.forEach((event) => {
   }
 });
 
-const render = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
-
 const tripMainElement = document.querySelector(`.trip-main`);
 
-render(tripMainElement, createTripInfoContainerTemplate(), `afterbegin`);
+renderNew(tripMainElement, new TripInfoContainerView().getElement(), RenderPosition.AFTERBEGIN);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
-render(tripInfoElement, createTripInfoMainTemplate());
-render(tripInfoElement, createTripInfoCostTemplate());
+renderNew(tripInfoElement, new TripInfoMainView().getElement());
+renderNew(tripInfoElement, new TripInfoCostView().getElement());
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
 
-render(tripControlsFirstHeaderElement, createMainNavTemplate(), `afterend`);
-render(tripControlsElement, createFilterTemplate());
+renderNew(tripControlsFirstHeaderElement, new MainNavView().getElement(), RenderPosition.AFTER);
+renderNew(tripControlsElement, new FilterView().getElement());
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 
-render(tripEventsElement, createSorterTemplate());
-render(tripEventsElement, createEventEditFormTemplate());
-render(tripEventsElement, createDaysTemplate());
+renderNew(tripEventsElement, new SorterView().getElement());
+renderNew(tripEventsElement, new EventEditFormView().getElement());
+renderNew(tripEventsElement, new DaysView().getElement());
 
 const eventEditFormElement = tripEventsElement.querySelector(`.event--edit`);
 
-render(eventEditFormElement, createEventEditFormHeaderTemplate(firstEvent));
-render(eventEditFormElement, createEventEditFormDetailsTemplate());
+renderNew(eventEditFormElement, new EventEditFormHeaderView(firstEvent).getElement());
+renderNew(eventEditFormElement, new EventEditFormDetailsView().getElement());
 
 const eventEditFormDetailsElement = eventEditFormElement.querySelector(`.event__details`);
 
 if (firstEvent.offers && firstEvent.offers.length !== 0) {
-  render(eventEditFormDetailsElement, createEventEditFormDetailsOfferTemplate());
+  renderNew(eventEditFormDetailsElement, new EventEditFormDetailsOfferView().getElement());
   const eventAvailableOffersContainer = eventEditFormDetailsElement.querySelector(`.event__available-offers`);
   firstEvent.offers.forEach((offer) => {
-    render(eventAvailableOffersContainer, createEventEditFormOfferTemplate(offer));
+    renderNew(eventAvailableOffersContainer, new EventEditFormOfferView(offer).getElement());
   });
 }
 
-render(eventEditFormDetailsElement, createEventEditFormDetailsDestinationTemplate(firstEvent.description));
+renderNew(eventEditFormDetailsElement, new EventEditFormDetailsDestinationView(firstEvent.description).getElement());
 const eventPhotosTape = tripEventsElement.querySelector(`.event__photos-tape`);
 firstEvent.photos.forEach((photo) => {
-  render(eventPhotosTape, createEventEditFormDetailsDestinationPhotoTemplate(photo));
+  renderNew(eventPhotosTape, new EventEditFormDetailsDestinationPhotoView(photo).getElement());
 });
 
 const eventDaysElement = tripEventsElement.querySelector(`.trip-days`);
 
-/*
-for (let i = 0; i < eventsGroups.length; i++) {
-  render(eventDaysElement, createDayTemplate(i + 1, eventsGroups[i][0].eventStartPoint.toISOString(), eventsGroups[i][0].eventStartPoint.toLocaleString(`en-US`, {month: `short`, day: `numeric`})));
-  const eventListElement = eventDaysElement.querySelectorAll(`.trip-events__list`);
-  for (let j = 0; j < eventsGroups[i].length; j++) {
-    render(eventListElement[eventListElement.length - 1], createEventTemplate(eventsGroups[i][j]));
-    const eventPreviewOffers = eventDaysElement.querySelectorAll(`.event__selected-offers`);
-    const offersLength = eventsGroups[i][j].offers.length;
-    const offerCount = offersLength > MAX_QUANTITY_OF_OFFERS_IN_PREVIEW ? MAX_QUANTITY_OF_OFFERS_IN_PREVIEW : offersLength;
-    for (let k = 0; k < offerCount; k++) {
-      render(eventPreviewOffers[eventPreviewOffers.length - 1], createEventPreviewOffer(eventsGroups[i][j].offers[k]));
-    }
-  }
-}
-*/
+Array.from(eventsGroups.keys()).forEach((dayKey, index) => {
+  renderNew(eventDaysElement, new DayView(dayKey, index + 1).getElement());
+});
 
-Array.from(eventsGroups.entries()).forEach(([dayKey, eventsGroup], index) => {
-  render(eventDaysElement, createDayTemplate(eventsGroup, dayKey, index + 1));
+Array.from(eventDaysElement.querySelectorAll(`.trip-events__list`)).forEach((list, index) => {
+  Array.from(eventsGroups.values())[index].forEach((item) => {
+    renderNew(list, new EventView(item).getElement());
+  });
 });

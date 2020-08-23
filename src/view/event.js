@@ -1,10 +1,11 @@
 import {basisConstants} from "../basis-constants.js";
-import {createEventPreviewOffer} from "./event-preview-offer.js";
+import {createEventPreviewOfferTemplate} from "./event-preview-offer.js";
+import {createElement} from "../utils.js";
 
 const {arrivals} = basisConstants;
 const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
-export const createEventTemplate = (event) => {
+const createEventTemplate = (event) => {
   const {waypointType, waypoint, offers, eventStartPoint, eventEndPoint, price} = event;
 
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
@@ -13,7 +14,7 @@ export const createEventTemplate = (event) => {
   const createOfferSet = () => {
     let offerSet = ``;
     for (let i = 0; i < offerCount; i++) {
-      offerSet += createEventPreviewOffer(offers[i]);
+      offerSet += createEventPreviewOfferTemplate(offers[i]);
     }
     return offerSet;
   };
@@ -60,3 +61,28 @@ export const createEventTemplate = (event) => {
     </div>
   </li>`;
 };
+
+export default class Event {
+  constructor(event) {
+    this.event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventTemplate(this.event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
