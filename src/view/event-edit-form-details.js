@@ -1,4 +1,8 @@
-import {createElement} from "../utils.js";
+import {createElement, render} from "../utils.js";
+import EventEditFormDetailsOfferView from "./event-edit-form-details-offer.js";
+import EventEditFormOfferView from "./event-edit-form-offer.js";
+import EventEditFormDetailsDestinationView from "./event-edit-form-details-destination.js";
+import EventEditFormDetailsDestinationPhotoView from "./event-edit-form-deaills-destination-photo.js";
 
 const createEventEditFormDetailsTemplate = () => {
   return `<section class="event__details">
@@ -20,6 +24,28 @@ export default class EventEditFormDetails {
     }
 
     return this._element;
+  }
+
+  addParts(item) {
+    const eventEditFormDetailsElement = this.getElement().querySelector(`.event__details`);
+
+    if (item.offers && item.offers.length !== 0) {
+      const eventEditFormDetailsOffer = new EventEditFormDetailsOfferView();
+
+      render(eventEditFormDetailsElement, eventEditFormDetailsOffer.getElement());
+      const eventAvailableOffersContainer = eventEditFormDetailsOffer.getElement().querySelector(`.event__available-offers`);
+      item.offers.forEach((offer) => {
+        render(eventAvailableOffersContainer, new EventEditFormOfferView(offer).getElement());
+      });
+    }
+
+    const eventEditFormDetailsDestinationView = new EventEditFormDetailsDestinationView(item.description);
+
+    render(eventEditFormDetailsElement, eventEditFormDetailsDestinationView.getElement());
+    const eventPhotosTape = eventEditFormDetailsDestinationView.getElement().querySelector(`.event__photos-tape`);
+    item.photos.forEach((photo) => {
+      render(eventPhotosTape, new EventEditFormDetailsDestinationPhotoView(photo).getElement());
+    });
   }
 
   removeElement() {

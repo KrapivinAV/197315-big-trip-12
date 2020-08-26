@@ -1,10 +1,6 @@
 import {createElement, render} from "../utils.js";
 import EventView from "./event.js";
-import EventEditFormView from "./view/event-edit-form.js";
-import EventEditFormDetailsOfferView from "./view/event-edit-form-details-offer.js";
-import EventEditFormOfferView from "./view/event-edit-form-offer.js";
-import EventEditFormDetailsDestinationView from "./view/event-edit-form-details-destination.js";
-import EventEditFormDetailsDestinationPhotoView from "./view/event-edit-form-deaills-destination-photo.js";
+import EventEditFormView from "./event-edit-form.js";
 
 const createDayTemplate = (dayKey, index) => {
 
