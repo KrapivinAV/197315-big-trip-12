@@ -1,10 +1,10 @@
 import {createElement} from "../utils.js";
 
-const createEventEditFormDetailsDestinationPhotoTemplate = (photo) => {
+const createPassageEditFormDetailsDestinationPhotoTemplate = (photo) => {
   return `<img class="event__photo" src="${photo}" alt="Event photo">`;
 };
 
-export default class EventEditFormDetailsDestinationPhoto {
+export default class PassageEditFormDetailsDestinationPhoto {
   constructor(photo) {
     this.photo = photo;
 
@@ -12,7 +12,7 @@ export default class EventEditFormDetailsDestinationPhoto {
   }
 
   getTemplate() {
-    return createEventEditFormDetailsDestinationPhotoTemplate(this.photo);
+    return createPassageEditFormDetailsDestinationPhotoTemplate(this.photo);
   }
 
   getElement() {

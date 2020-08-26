@@ -1,6 +1,6 @@
 import {createElement, render} from "../utils.js";
-import EventView from "./event.js";
-import EventEditFormView from "./event-edit-form.js";
+import PassageView from "./passage.js";
+import PassageEditFormView from "./passage-edit-form.js";
 
 const createDayTemplate = (dayKey, index) => {
 
@@ -35,24 +35,41 @@ export default class Day {
     return this._element;
   }
 
-  addEvents(items) {
+  addPassages(items) {
     const list = this.getElement().querySelector(`.trip-events__list`);
 
     items.forEach((item) => {
-      const eventView = new EventView(item);
-      eventView.addOffers(item.offers);
+      const onEscKeyDown = (evt) => {
+        if (evt.key === `Escape` || evt.key === `Esc`) {
+          evt.preventDefault();
+          passageViewElement.replaceChild(passageInnerViewElement, passageEditFormViewElement);
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
+      };
 
-      const eventEditFormView = new EventEditFormView(item);
-      eventEditFormView.addParts(item);
+      const passageView = new PassageView(item);
+      passageView.addOffers(item.offers);
 
-      const eventViewElement = eventView.getElement();
+      const passageEditFormView = new PassageEditFormView(item);
+      passageEditFormView.addParts(item);
 
-      render(list, eventViewElement);
+      const passageViewElement = passageView.getElement();
+      const passageEditFormViewElement = passageEditFormView.getElement();
 
-      eventViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
-        list.replaceChild(eventEditFormView.getElement(), eventViewElement);
+      render(list, passageViewElement);
+
+      const passageInnerViewElement = passageViewElement.querySelector(`.event`);
+
+      passageViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
+        passageViewElement.replaceChild(passageEditFormViewElement, passageInnerViewElement);
+        document.addEventListener(`keydown`, onEscKeyDown);
       });
 
+      passageEditFormViewElement.addEventListener(`submit`, (evt)=>{
+        evt.preventDefault();
+        passageViewElement.replaceChild(passageInnerViewElement, passageEditFormViewElement);
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      });
     });
   }
 

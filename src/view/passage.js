@@ -1,12 +1,12 @@
 import {basisConstants} from "../basis-constants.js";
-import EventPreviewOfferView from "./event-preview-offer.js";
+import PassagePreviewOfferView from "./passage-preview-offer.js";
 import {createElement, render} from "../utils.js";
 
 const {arrivals} = basisConstants;
 const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
-const createEventTemplate = (event) => {
-  const {waypointType, waypoint, eventStartPoint, eventEndPoint, price} = event;
+const createPassageTemplate = (passage) => {
+  const {waypointType, waypoint, passageStartPoint, passageEndPoint, price} = passage;
 
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
 
@@ -30,11 +30,11 @@ const createEventTemplate = (event) => {
 
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${eventStartPoint.toISOString()}">${eventStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
+          <time class="event__start-time" datetime="${passageStartPoint.toISOString()}">${passageStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
           &mdash;
-          <time class="event__end-time" datetime="${eventEndPoint.toISOString()}">${eventEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
+          <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${passageEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
         </p>
-        <p class="event__duration">${generateDuration(eventStartPoint, eventEndPoint)}</p>
+        <p class="event__duration">${generateDuration(passageStartPoint, passageEndPoint)}</p>
       </div>
 
       <p class="event__price">
@@ -52,15 +52,15 @@ const createEventTemplate = (event) => {
   </li>`;
 };
 
-export default class Event {
-  constructor(event) {
-    this.event = event;
+export default class Passage {
+  constructor(passage) {
+    this.passage = passage;
 
     this._element = null;
   }
 
   getTemplate() {
-    return createEventTemplate(this.event);
+    return createPassageTemplate(this.passage);
   }
 
   getElement() {
@@ -75,7 +75,7 @@ export default class Event {
     const offersList = this.getElement().querySelector(`.event__selected-offers`);
 
     offers.slice().splice(0, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW).forEach((offer) => {
-      const currentOffer = new EventPreviewOfferView(offer);
+      const currentOffer = new PassagePreviewOfferView(offer);
       render(offersList, currentOffer.getElement());
     });
   }

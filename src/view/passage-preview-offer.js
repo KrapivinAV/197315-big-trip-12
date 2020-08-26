@@ -1,6 +1,6 @@
 import {createElement} from "../utils.js";
 
-const createEventPreviewOfferTemplate = (offer) => {
+const createPassagePreviewOfferTemplate = (offer) => {
   const {title, cost} = offer;
 
   return `<li class="event__offer">
@@ -10,7 +10,7 @@ const createEventPreviewOfferTemplate = (offer) => {
   </li>`;
 };
 
-export default class EventPreviewOffer {
+export default class PassagePreviewOffer {
   constructor(offer) {
     this.offer = offer;
 
@@ -18,7 +18,7 @@ export default class EventPreviewOffer {
   }
 
   getTemplate() {
-    return createEventPreviewOfferTemplate(this.offer);
+    return createPassagePreviewOfferTemplate(this.offer);
   }
 
   getElement() {

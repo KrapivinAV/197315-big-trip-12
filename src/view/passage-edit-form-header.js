@@ -3,8 +3,8 @@ import {createElement} from "../utils.js";
 
 const {arrivals} = basisConstants;
 
-const createEventEditFormHeaderTemplate = (event) => {
-  const {waypointType, waypoint, eventStartPoint, eventEndPoint, price} = event;
+const createPassageEditFormHeaderTemplate = (passage) => {
+  const {waypointType, waypoint, passageStartPoint, passageEndPoint, price} = passage;
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
 
   return `<header class="event__header">
@@ -93,12 +93,12 @@ const createEventEditFormHeaderTemplate = (event) => {
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartPoint.toLocaleString(`en-GB`, {year: `2-digit`, month: `numeric`, day: `numeric`})} ${eventStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${passageStartPoint.toLocaleString(`en-GB`, {year: `2-digit`, month: `numeric`, day: `numeric`})} ${passageStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}">
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndPoint.toLocaleString(`en-GB`, {year: `2-digit`, month: `numeric`, day: `numeric`})} ${eventEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${passageEndPoint.toLocaleString(`en-GB`, {year: `2-digit`, month: `numeric`, day: `numeric`})} ${passageEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}">
     </div>
 
     <div class="event__field-group  event__field-group--price">
@@ -114,15 +114,15 @@ const createEventEditFormHeaderTemplate = (event) => {
   </header>`;
 };
 
-export default class EventEditFormHeader {
-  constructor(event) {
-    this.event = event;
+export default class PassageEditFormHeader {
+  constructor(passage) {
+    this.passage = passage;
 
     this._element = null;
   }
 
   getTemplate() {
-    return createEventEditFormHeaderTemplate(this.event);
+    return createPassageEditFormHeaderTemplate(this.passage);
   }
 
   getElement() {

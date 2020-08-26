@@ -1,6 +1,6 @@
 import {createElement} from "../utils.js";
 
-const createEventEditFormDetailsOfferTemplate = () => {
+const createPassageEditFormDetailsOfferTemplate = () => {
   return `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
@@ -9,13 +9,13 @@ const createEventEditFormDetailsOfferTemplate = () => {
   </section>`;
 };
 
-export default class EventEditFormDetailsOffer {
+export default class PassageEditFormDetailsOffer {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createEventEditFormDetailsOfferTemplate();
+    return createPassageEditFormDetailsOfferTemplate();
   }
 
   getElement() {

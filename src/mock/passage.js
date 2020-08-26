@@ -35,11 +35,11 @@ const generateOffers = (category, index) => {
     generateOfferSet(arrivals[index].offerSet);
 };
 
-const generateEventStartPoint = (time) => {
+const generatePassageStartPoint = (time) => {
   return new Date(getRandomInteger(time - maxDaysGap * msInOneDay, time + maxDaysGap * msInOneDay));
 };
 
-const generateEventEndPoint = (time, start) => {
+const generatePassageEndPoint = (time, start) => {
   return new Date(getRandomInteger(start + 1, time + maxDaysGap * msInOneDay));
 };
 
@@ -55,13 +55,13 @@ const generatePhotos = () => {
   return new Set(new Array(quantity).fill().map(() => `http://picsum.photos/248/152?r=${Math.random()}`));
 };
 
-export const generateEvent = () => {
+export const generatePassage = () => {
   const waypointType = generateWaypointType();
   const waypoint = generateWaypoint();
   const offers = Array.from(generateOffers(waypointTypeCategory, waypointTypeIndex));
   const currentTime = Date.now();
-  const eventStartPoint = generateEventStartPoint(currentTime);
-  const eventEndPoint = generateEventEndPoint(currentTime, eventStartPoint.getTime());
+  const passageStartPoint = generatePassageStartPoint(currentTime);
+  const passageEndPoint = generatePassageEndPoint(currentTime, passageStartPoint.getTime());
   const description = Array.from(generateDescription()).join(`. `);
   const photos = Array.from(generatePhotos());
   const price = getRandomInteger(1, maxPrice);
@@ -70,8 +70,8 @@ export const generateEvent = () => {
     waypointType,
     waypoint,
     offers,
-    eventStartPoint,
-    eventEndPoint,
+    passageStartPoint,
+    passageEndPoint,
     description,
     photos,
     price
