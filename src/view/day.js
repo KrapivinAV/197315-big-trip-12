@@ -1,12 +1,10 @@
 import {createElement, render} from "../utils.js";
 import EventView from "./event.js";
 import EventEditFormView from "./view/event-edit-form.js";
-import EventEditFormHeaderView from "./view/event-edit-form-header.js";
-import EventEditFormDetailsView from "./view/event-edit-form-details.js";
 import EventEditFormDetailsOfferView from "./view/event-edit-form-details-offer.js";
 import EventEditFormOfferView from "./view/event-edit-form-offer.js";
 import EventEditFormDetailsDestinationView from "./view/event-edit-form-details-destination.js";
-import EventEditFormDetailsDestinationPhotoView from "./view/photo.js";
+import EventEditFormDetailsDestinationPhotoView from "./view/event-edit-form-deaills-destination-photo.js";
 
 const createDayTemplate = (dayKey, index) => {
 
@@ -49,7 +47,7 @@ export default class Day {
       eventView.addOffers(item.offers);
 
       const eventEditFormView = new EventEditFormView(item);
-      eventEditFormView.add
+      eventEditFormView.addParts(item);
 
       const eventViewElement = eventView.getElement();
 

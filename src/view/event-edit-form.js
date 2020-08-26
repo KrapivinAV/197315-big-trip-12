@@ -1,4 +1,6 @@
-import {createElement} from "../utils.js";
+import {createElement, render} from "../utils.js";
+import EventEditFormHeaderView from "./view/event-edit-form-header.js";
+import EventEditFormDetailsView from "./view/event-edit-form-details.js";
 
 const createEventEditFormTemplate = () => {
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -20,6 +22,16 @@ export default class EventEditForm {
     }
 
     return this._element;
+  }
+
+  addParts(item) {
+    const container = this.getElement().querySelector(`.event--edit`);
+
+    const eventEditFormHeader = new EventEditFormHeaderView(item);
+    const eventEditFormDetails = new EventEditFormDetailsView(item);
+
+    render(container, eventEditFormHeader.getElement());
+    render(container, eventEditFormDetails.getElement());
   }
 
   removeElement() {
