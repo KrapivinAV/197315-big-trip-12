@@ -74,7 +74,7 @@ export default class Event {
   addOffers(offers) {
     const offersList = this.getElement().querySelector(`.event__selected-offers`);
 
-    offers.splice(0, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW).forEach((offer) => {
+    offers.slice().splice(0, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW).forEach((offer) => {
       const currentOffer = new EventPreviewOfferView(offer);
       render(offersList, currentOffer.getElement());
     });

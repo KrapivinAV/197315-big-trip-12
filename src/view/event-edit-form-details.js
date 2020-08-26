@@ -27,7 +27,7 @@ export default class EventEditFormDetails {
   }
 
   addParts(item) {
-    const eventEditFormDetailsElement = this.getElement().querySelector(`.event__details`);
+    const eventEditFormDetailsElement = this.getElement();
 
     if (item.offers && item.offers.length !== 0) {
       const eventEditFormDetailsOffer = new EventEditFormDetailsOfferView();

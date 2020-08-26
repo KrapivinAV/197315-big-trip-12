@@ -47,11 +47,12 @@ export default class Day {
 
       const eventViewElement = eventView.getElement();
 
-      // eventViewElement.querySelector(`.event__title`).addEventListener(`click`, (evt)=>{
-      //   console.log(evt.target);
-      // });
-
       render(list, eventViewElement);
+
+      eventViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
+        list.replaceChild(eventEditFormView.getElement(), eventViewElement);
+      });
+
     });
   }
 

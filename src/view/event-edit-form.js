@@ -28,6 +28,7 @@ export default class EventEditForm {
     const container = this.getElement();
     const eventEditFormHeader = new EventEditFormHeaderView(item);
     const eventEditFormDetails = new EventEditFormDetailsView(item);
+    eventEditFormDetails.addParts(item);
 
     render(container, eventEditFormHeader.getElement());
     render(container, eventEditFormDetails.getElement());
