@@ -19,7 +19,7 @@ export const RenderPosition = {
   AFTER: `after`
 };
 
-export const renderNew = (container, element, place = RenderPosition.BEFOREEND) => {
+export const render = (container, element, place = RenderPosition.BEFOREEND) => {
   switch (place) {
     case RenderPosition.AFTERBEGIN:
       container.prepend(element);

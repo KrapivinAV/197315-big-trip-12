@@ -1,23 +1,14 @@
 import {basisConstants} from "../basis-constants.js";
-import {createEventPreviewOfferTemplate} from "./event-preview-offer.js";
-import {createElement} from "../utils.js";
+import EventPreviewOfferView from "./event-preview-offer.js";
+import {createElement, render} from "../utils.js";
 
 const {arrivals} = basisConstants;
 const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
 const createEventTemplate = (event) => {
-  const {waypointType, waypoint, offers, eventStartPoint, eventEndPoint, price} = event;
+  const {waypointType, waypoint, eventStartPoint, eventEndPoint, price} = event;
 
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
-  const offerCount = Math.min(offers.length, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW);
-
-  const createOfferSet = () => {
-    let offerSet = ``;
-    for (let i = 0; i < offerCount; i++) {
-      offerSet += createEventPreviewOfferTemplate(offers[i]);
-    }
-    return offerSet;
-  };
 
   const generateDuration = (start, end) => {
     const difference = new Date(end - start);
@@ -52,7 +43,6 @@ const createEventTemplate = (event) => {
 
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${createOfferSet()}
       </ul>
 
       <button class="event__rollup-btn" type="button">
@@ -81,8 +71,16 @@ export default class Event {
     return this._element;
   }
 
+  addOffers(offers) {
+    const offersList = this.getElement().querySelector(`.event__selected-offers`);
+
+    offers.splice(0, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW).forEach((offer) => {
+      const currentOffer = new EventPreviewOfferView(offer);
+      render(offersList, currentOffer.getElement());
+    });
+  }
+
   removeElement() {
     this._element = null;
   }
 }
-
