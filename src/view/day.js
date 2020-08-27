@@ -1,33 +1,82 @@
-/*
-export const createDayTemplate = (index, mashineDate, humanDate) => {
+import {createElement, render} from "../utils.js";
+import PassageContainerView from "./passage-container.js";
+import PassagePreviewView from "./passage-preview.js";
+import PassageEditFormView from "./passage-edit-form.js";
+
+const createDayTemplate = (dayKey, index) => {
+
   return `<li class="trip-days__item  day">
     <div class="day__info">
       <span class="day__counter">${index}</span>
-      <time class="day__date" datetime="${mashineDate}">${humanDate}</time>
+      <time class="day__date" datetime="${new Date(dayKey).toISOString()}">${new Date(dayKey).toLocaleString(`en-US`, {month: `short`, day: `numeric`})}</time>
     </div>
 
     <ul class="trip-events__list">
     </ul>
   </li>`;
 };
-*/
 
-import {createEventTemplate} from "./event.js";
+export default class Day {
+  constructor(dayKey, items, index) {
+    this.dayKey = dayKey;
+    this.items = items;
+    this.index = index;
 
-export const createDayTemplate = (eventsGroup, dayKey, index) => {
-  let dayEventGroup = ``;
-  eventsGroup.forEach((event) => {
-    dayEventGroup += createEventTemplate(event);
-  });
+    this._element = null;
+  }
 
-  return `<li class="trip-days__item  day">
-    <div class="day__info">
-      <span class="day__counter">${index}</span>
-      <time class="day__date" datetime="${eventsGroup[0].eventStartPoint.toISOString()}">${new Date(dayKey).toLocaleString(`en-US`, {month: `short`, day: `numeric`})}</time>
-    </div>
+  getTemplate() {
+    return createDayTemplate(this.dayKey, this.index);
+  }
 
-    <ul class="trip-events__list">
-      ${dayEventGroup}
-    </ul>
-  </li>`;
-};
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  addPassages() {
+    const list = this.getElement().querySelector(`.trip-events__list`);
+
+    this.items.forEach((item) => {
+      const passageContainerView = new PassageContainerView().getElement();
+      render(list, passageContainerView);
+
+      const passagePreviewView = new PassagePreviewView(item);
+      passagePreviewView.addOffers();
+
+      const passageEditFormView = new PassageEditFormView(item);
+      passageEditFormView.addParts();
+
+      const passagePreviewViewElement = passagePreviewView.getElement();
+      const passageEditFormViewElement = passageEditFormView.getElement();
+
+      render(passageContainerView, passagePreviewViewElement);
+
+      const onEscKeyDown = (evt) => {
+        if (evt.key === `Escape` || evt.key === `Esc`) {
+          evt.preventDefault();
+          passageContainerView.replaceChild(passagePreviewViewElement, passageEditFormViewElement);
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
+      };
+
+      passagePreviewViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
+        passageContainerView.replaceChild(passageEditFormViewElement, passagePreviewViewElement);
+        document.addEventListener(`keydown`, onEscKeyDown);
+      });
+
+      passageEditFormViewElement.addEventListener(`submit`, (evt)=>{
+        evt.preventDefault();
+        passageContainerView.replaceChild(passagePreviewViewElement, passageEditFormViewElement);
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      });
+    });
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
