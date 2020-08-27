@@ -1,5 +1,6 @@
 import {createElement, render} from "../utils.js";
-import PassageView from "./passage.js";
+import PassageContainerView from "./passage-container.js";
+import PassagePreviewView from "./passage-preview.js";
 import PassageEditFormView from "./passage-edit-form.js";
 
 const createDayTemplate = (dayKey, index) => {
@@ -16,8 +17,9 @@ const createDayTemplate = (dayKey, index) => {
 };
 
 export default class Day {
-  constructor(dayKey, index) {
+  constructor(dayKey, items, index) {
     this.dayKey = dayKey;
+    this.items = items;
     this.index = index;
 
     this._element = null;
@@ -35,39 +37,40 @@ export default class Day {
     return this._element;
   }
 
-  addPassages(items) {
+  addPassages() {
     const list = this.getElement().querySelector(`.trip-events__list`);
 
-    items.forEach((item) => {
+    this.items.forEach((item) => {
+      const passageContainerView = new PassageContainerView().getElement();
+      render(list, passageContainerView);
+
+      const passagePreviewView = new PassagePreviewView(item);
+      passagePreviewView.addOffers();
+
+      const passageEditFormView = new PassageEditFormView(item);
+      passageEditFormView.addParts();
+
+      const passagePreviewViewElement = passagePreviewView.getElement();
+      const passageEditFormViewElement = passageEditFormView.getElement();
+
+      render(passageContainerView, passagePreviewViewElement);
+
       const onEscKeyDown = (evt) => {
         if (evt.key === `Escape` || evt.key === `Esc`) {
           evt.preventDefault();
-          passageViewElement.replaceChild(passageInnerViewElement, passageEditFormViewElement);
+          passageContainerView.replaceChild(passagePreviewViewElement, passageEditFormViewElement);
           document.removeEventListener(`keydown`, onEscKeyDown);
         }
       };
 
-      const passageView = new PassageView(item);
-      passageView.addOffers(item.offers);
-
-      const passageEditFormView = new PassageEditFormView(item);
-      passageEditFormView.addParts(item);
-
-      const passageViewElement = passageView.getElement();
-      const passageEditFormViewElement = passageEditFormView.getElement();
-
-      render(list, passageViewElement);
-
-      const passageInnerViewElement = passageViewElement.querySelector(`.event`);
-
-      passageViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
-        passageViewElement.replaceChild(passageEditFormViewElement, passageInnerViewElement);
+      passagePreviewViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
+        passageContainerView.replaceChild(passageEditFormViewElement, passagePreviewViewElement);
         document.addEventListener(`keydown`, onEscKeyDown);
       });
 
       passageEditFormViewElement.addEventListener(`submit`, (evt)=>{
         evt.preventDefault();
-        passageViewElement.replaceChild(passageInnerViewElement, passageEditFormViewElement);
+        passageContainerView.replaceChild(passagePreviewViewElement, passageEditFormViewElement);
         document.removeEventListener(`keydown`, onEscKeyDown);
       });
     });

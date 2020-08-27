@@ -8,7 +8,9 @@ const createPassageEditFormTemplate = () => {
 };
 
 export default class PassageEditForm {
-  constructor() {
+  constructor(item) {
+    this.item = item;
+
     this._element = null;
   }
 
@@ -24,11 +26,11 @@ export default class PassageEditForm {
     return this._element;
   }
 
-  addParts(item) {
+  addParts() {
     const container = this.getElement();
-    const passageEditFormHeader = new PassageEditFormHeaderView(item);
-    const passageEditFormDetails = new PassageEditFormDetailsView(item);
-    passageEditFormDetails.addParts(item);
+    const passageEditFormHeader = new PassageEditFormHeaderView(this.item);
+    const passageEditFormDetails = new PassageEditFormDetailsView(this.item);
+    passageEditFormDetails.addParts();
 
     render(container, passageEditFormHeader.getElement());
     render(container, passageEditFormDetails.getElement());

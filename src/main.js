@@ -54,9 +54,9 @@ const passageDaysElement = tripPassagesElement.querySelector(`.trip-days`);
 Array.from(passagesGroups.entries()).forEach((dayGroup, index) => {
   const [dayKey, items] = dayGroup;
 
-  const dayView = new DayView(dayKey, index + 1);
+  const dayView = new DayView(dayKey, items, index + 1);
 
-  dayView.addPassages(items);
+  dayView.addPassages();
 
   render(passageDaysElement, dayView.getElement());
 });

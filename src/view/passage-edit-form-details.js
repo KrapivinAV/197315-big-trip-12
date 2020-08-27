@@ -10,7 +10,9 @@ const createPassageEditFormDetailsTemplate = () => {
 };
 
 export default class PassageEditFormDetails {
-  constructor() {
+  constructor(item) {
+    this.item = item;
+
     this._element = null;
   }
 
@@ -26,24 +28,24 @@ export default class PassageEditFormDetails {
     return this._element;
   }
 
-  addParts(item) {
+  addParts() {
     const passageEditFormDetailsElement = this.getElement();
 
-    if (item.offers && item.offers.length !== 0) {
+    if (this.item.offers && this.item.offers.length !== 0) {
       const passageEditFormDetailsOffer = new PassageEditFormDetailsOfferView();
 
       render(passageEditFormDetailsElement, passageEditFormDetailsOffer.getElement());
       const passageAvailableOffersContainer = passageEditFormDetailsOffer.getElement().querySelector(`.event__available-offers`);
-      item.offers.forEach((offer) => {
+      this.item.offers.forEach((offer) => {
         render(passageAvailableOffersContainer, new PassageEditFormOfferView(offer).getElement());
       });
     }
 
-    const passageEditFormDetailsDestinationView = new PassageEditFormDetailsDestinationView(item.description);
+    const passageEditFormDetailsDestinationView = new PassageEditFormDetailsDestinationView(this.item.description);
 
     render(passageEditFormDetailsElement, passageEditFormDetailsDestinationView.getElement());
     const passagePhotosTape = passageEditFormDetailsDestinationView.getElement().querySelector(`.event__photos-tape`);
-    item.photos.forEach((photo) => {
+    this.item.photos.forEach((photo) => {
       render(passagePhotosTape, new PassageEditFormDetailsDestinationPhotoView(photo).getElement());
     });
   }
