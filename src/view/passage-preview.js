@@ -1,6 +1,7 @@
 import {basisConstants} from "../basis-constants.js";
 import PassagePreviewOfferView from "./passage-preview-offer.js";
-import {createElement, render} from "../utils.js";
+import {render} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const {arrivals} = basisConstants;
 const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
@@ -50,23 +51,15 @@ const createPassagePreviewTemplate = (passage) => {
   </div>`;
 };
 
-export default class PassagePreview {
+export default class PassagePreview extends AbstractView {
   constructor(passage) {
-    this.passage = passage;
+    super();
 
-    this._element = null;
+    this.passage = passage;
   }
 
   getTemplate() {
     return createPassagePreviewTemplate(this.passage);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   addOffers() {
@@ -76,9 +69,5 @@ export default class PassagePreview {
       const currentOffer = new PassagePreviewOfferView(offer);
       render(offersList, currentOffer.getElement());
     });
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

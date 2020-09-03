@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createPassageEditFormDetailsDestinationTemplate = (description) => {
   return `<section class="event__section  event__section--destination">
@@ -12,26 +12,14 @@ const createPassageEditFormDetailsDestinationTemplate = (description) => {
   </section>`;
 };
 
-export default class PassageEditFormDetailsDestination {
+export default class PassageEditFormDetailsDestination extends AbstractView {
   constructor(description) {
-    this.description = description;
+    super();
 
-    this._element = null;
+    this.description = description;
   }
 
   getTemplate() {
     return createPassageEditFormDetailsDestinationTemplate(this.description);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

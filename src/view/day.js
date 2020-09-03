@@ -1,4 +1,5 @@
-import {createElement, render} from "../utils.js";
+import {render} from "../utils.js";
+import AbstractView from "./abstract.js";
 import PassageContainerView from "./passage-container.js";
 import PassagePreviewView from "./passage-preview.js";
 import PassageEditFormView from "./passage-edit-form.js";
@@ -16,25 +17,17 @@ const createDayTemplate = (dayKey, index) => {
   </li>`;
 };
 
-export default class Day {
+export default class Day extends AbstractView {
   constructor(dayKey, items, index) {
+    super();
+
     this.dayKey = dayKey;
     this.items = items;
     this.index = index;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createDayTemplate(this.dayKey, this.index);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   addPassages() {
@@ -74,9 +67,5 @@ export default class Day {
         document.removeEventListener(`keydown`, onEscKeyDown);
       });
     });
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

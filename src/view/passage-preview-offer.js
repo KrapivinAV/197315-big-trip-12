@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createPassagePreviewOfferTemplate = (offer) => {
   const {title, cost} = offer;
@@ -10,27 +10,15 @@ const createPassagePreviewOfferTemplate = (offer) => {
   </li>`;
 };
 
-export default class PassagePreviewOffer {
+export default class PassagePreviewOffer extends AbstractView {
   constructor(offer) {
-    this.offer = offer;
+    super();
 
-    this._element = null;
+    this.offer = offer;
   }
 
   getTemplate() {
     return createPassagePreviewOfferTemplate(this.offer);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

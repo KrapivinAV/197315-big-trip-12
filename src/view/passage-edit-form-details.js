@@ -1,4 +1,5 @@
-import {createElement, render} from "../utils.js";
+import {render} from "../utils.js";
+import AbstractView from "./abstract.js";
 import PassageEditFormDetailsOfferView from "./passage-edit-form-details-offer.js";
 import PassageEditFormOfferView from "./passage-edit-form-offer.js";
 import PassageEditFormDetailsDestinationView from "./passage-edit-form-details-destination.js";
@@ -9,23 +10,15 @@ const createPassageEditFormDetailsTemplate = () => {
   </section>`;
 };
 
-export default class PassageEditFormDetails {
+export default class PassageEditFormDetails extends AbstractView {
   constructor(item) {
-    this.item = item;
+    super();
 
-    this._element = null;
+    this.item = item;
   }
 
   getTemplate() {
     return createPassageEditFormDetailsTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   addParts() {
@@ -48,9 +41,5 @@ export default class PassageEditFormDetails {
     this.item.photos.forEach((photo) => {
       render(passagePhotosTape, new PassageEditFormDetailsDestinationPhotoView(photo).getElement());
     });
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
