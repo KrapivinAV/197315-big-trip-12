@@ -1,6 +1,6 @@
 import {basisConstants} from "../basis-constants.js";
 import PassagePreviewOfferView from "./passage-preview-offer.js";
-import {render} from "../utils.js";
+import {render} from "../utils/render.js";
 import AbstractView from "./abstract.js";
 
 const {arrivals} = basisConstants;
@@ -67,7 +67,7 @@ export default class PassagePreview extends AbstractView {
 
     this.passage.offers.slice().splice(0, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW).forEach((offer) => {
       const currentOffer = new PassagePreviewOfferView(offer);
-      render(offersList, currentOffer.getElement());
+      render(offersList, currentOffer);
     });
   }
 }

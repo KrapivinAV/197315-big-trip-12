@@ -1,4 +1,4 @@
-import {render} from "../utils.js";
+import {render} from "../utils/render.js";
 import AbstractView from "./abstract.js";
 import PassageEditFormHeaderView from "./passage-edit-form-header.js";
 import PassageEditFormDetailsView from "./passage-edit-form-details.js";
@@ -20,12 +20,11 @@ export default class PassageEditForm extends AbstractView {
   }
 
   addParts() {
-    const container = this.getElement();
     const passageEditFormHeader = new PassageEditFormHeaderView(this.item);
     const passageEditFormDetails = new PassageEditFormDetailsView(this.item);
     passageEditFormDetails.addParts();
 
-    render(container, passageEditFormHeader.getElement());
-    render(container, passageEditFormDetails.getElement());
+    render(this, passageEditFormHeader);
+    render(this, passageEditFormDetails);
   }
 }

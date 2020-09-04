@@ -7,7 +7,7 @@ import SorterView from "./view/sorter.js";
 import DaysView from "./view/days.js";
 import DayView from "./view/day.js";
 import {generatePassage} from "./mock/passage.js";
-import {render, RenderPosition} from "./utils.js";
+import {render, RenderPosition} from "./utils/render.js";
 
 const PASSAGE_COUNT = 20;
 
