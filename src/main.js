@@ -1,13 +1,5 @@
-import TripInfoContainerView from "./view/trip-info-container.js";
-import TripInfoMainView from "./view/trip-info-main.js";
-import TripInfoCostView from "./view/trip-info-cost.js";
-import MainNavView from "./view/main-nav.js";
-import FilterView from "./view/filter.js";
-import SorterView from "./view/sorter.js";
-import DaysView from "./view/days.js";
-import DayView from "./view/day.js";
 import {generatePassage} from "./mock/passage.js";
-import {render, RenderPosition} from "./utils/render.js";
+import TripPresenter from "./presenter/trip.js";
 
 const PASSAGE_COUNT = 20;
 
@@ -29,34 +21,7 @@ passages.forEach((passage) => {
 });
 
 const tripMainElement = document.querySelector(`.trip-main`);
-
-render(tripMainElement, new TripInfoContainerView().getElement(), RenderPosition.AFTERBEGIN);
-
-const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
-
-render(tripInfoElement, new TripInfoMainView().getElement());
-render(tripInfoElement, new TripInfoCostView().getElement());
-
-const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
-const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
-
-render(tripControlsFirstHeaderElement, new MainNavView().getElement(), RenderPosition.AFTER);
-render(tripControlsElement, new FilterView().getElement());
-
 const tripPassagesElement = document.querySelector(`.trip-events`);
+const trip = new TripPresenter(tripMainElement, tripPassagesElement, passagesGroups);
 
-render(tripPassagesElement, new SorterView().getElement());
-
-render(tripPassagesElement, new DaysView().getElement());
-
-const passageDaysElement = tripPassagesElement.querySelector(`.trip-days`);
-
-Array.from(passagesGroups.entries()).forEach((dayGroup, index) => {
-  const [dayKey, items] = dayGroup;
-
-  const dayView = new DayView(dayKey, items, index + 1);
-
-  dayView.addPassages();
-
-  render(passageDaysElement, dayView.getElement());
-});
+trip.init();

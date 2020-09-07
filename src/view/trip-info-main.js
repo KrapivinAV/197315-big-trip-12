@@ -8,7 +8,13 @@ const createTripInfoMainTemplate = () => {
 };
 
 export default class TripInfoMain extends AbstractView {
+  constructor(passagesGroups) {
+    super();
+
+    this.passagesGroups = passagesGroups;
+  }
+
   getTemplate() {
-    return createTripInfoMainTemplate();
+    return this.passagesGroups.size ? createTripInfoMainTemplate() : ` `;
   }
 }
