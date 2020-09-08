@@ -1,4 +1,5 @@
-import {createElement, render} from "../utils.js";
+import {render, replace} from "../utils/render.js";
+import AbstractView from "./abstract.js";
 import PassageContainerView from "./passage-container.js";
 import PassagePreviewView from "./passage-preview.js";
 import PassageEditFormView from "./passage-edit-form.js";
@@ -16,32 +17,24 @@ const createDayTemplate = (dayKey, index) => {
   </li>`;
 };
 
-export default class Day {
+export default class Day extends AbstractView {
   constructor(dayKey, items, index) {
+    super();
+
     this.dayKey = dayKey;
     this.items = items;
     this.index = index;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createDayTemplate(this.dayKey, this.index);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
   addPassages() {
     const list = this.getElement().querySelector(`.trip-events__list`);
 
     this.items.forEach((item) => {
-      const passageContainerView = new PassageContainerView().getElement();
+      const passageContainerView = new PassageContainerView();
       render(list, passageContainerView);
 
       const passagePreviewView = new PassagePreviewView(item);
@@ -50,33 +43,26 @@ export default class Day {
       const passageEditFormView = new PassageEditFormView(item);
       passageEditFormView.addParts();
 
-      const passagePreviewViewElement = passagePreviewView.getElement();
-      const passageEditFormViewElement = passageEditFormView.getElement();
-
-      render(passageContainerView, passagePreviewViewElement);
+      render(passageContainerView, passagePreviewView);
 
       const onEscKeyDown = (evt) => {
         if (evt.key === `Escape` || evt.key === `Esc`) {
           evt.preventDefault();
-          passageContainerView.replaceChild(passagePreviewViewElement, passageEditFormViewElement);
+          replace(passagePreviewView, passageEditFormView);
           document.removeEventListener(`keydown`, onEscKeyDown);
         }
       };
 
-      passagePreviewViewElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
-        passageContainerView.replaceChild(passageEditFormViewElement, passagePreviewViewElement);
+      passagePreviewView.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, ()=>{
+        replace(passageEditFormView, passagePreviewView);
         document.addEventListener(`keydown`, onEscKeyDown);
       });
 
-      passageEditFormViewElement.addEventListener(`submit`, (evt)=>{
+      passageEditFormView.getElement().addEventListener(`submit`, (evt)=>{
         evt.preventDefault();
-        passageContainerView.replaceChild(passagePreviewViewElement, passageEditFormViewElement);
+        replace(passagePreviewView, passageEditFormView);
         document.removeEventListener(`keydown`, onEscKeyDown);
       });
     });
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

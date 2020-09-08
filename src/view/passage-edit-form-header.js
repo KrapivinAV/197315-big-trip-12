@@ -1,5 +1,5 @@
 import {basisConstants} from "../basis-constants.js";
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const {arrivals} = basisConstants;
 
@@ -114,26 +114,14 @@ const createPassageEditFormHeaderTemplate = (passage) => {
   </header>`;
 };
 
-export default class PassageEditFormHeader {
+export default class PassageEditFormHeader extends AbstractView {
   constructor(passage) {
-    this.passage = passage;
+    super();
 
-    this._element = null;
+    this.passage = passage;
   }
 
   getTemplate() {
     return createPassageEditFormHeaderTemplate(this.passage);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createTripInfoMainTemplate = () => {
   return `<div class="trip-info__main">
@@ -7,24 +7,14 @@ const createTripInfoMainTemplate = () => {
   </div>`;
 };
 
-export default class TripInfoMain {
-  constructor() {
-    this._element = null;
+export default class TripInfoMain extends AbstractView {
+  constructor(passagesGroups) {
+    super();
+
+    this.passagesGroups = passagesGroups;
   }
 
   getTemplate() {
-    return createTripInfoMainTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return this.passagesGroups.size ? createTripInfoMainTemplate() : ` `;
   }
 }

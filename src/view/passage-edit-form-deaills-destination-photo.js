@@ -1,29 +1,17 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createPassageEditFormDetailsDestinationPhotoTemplate = (photo) => {
   return `<img class="event__photo" src="${photo}" alt="Event photo">`;
 };
 
-export default class PassageEditFormDetailsDestinationPhoto {
+export default class PassageEditFormDetailsDestinationPhoto extends AbstractView {
   constructor(photo) {
-    this.photo = photo;
+    super();
 
-    this._element = null;
+    this.photo = photo;
   }
 
   getTemplate() {
     return createPassageEditFormDetailsDestinationPhotoTemplate(this.photo);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

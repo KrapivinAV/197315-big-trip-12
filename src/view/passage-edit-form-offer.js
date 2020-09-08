@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createPassageEditFormOfferTemplate = (offer) => {
   const {title, cost} = offer;
@@ -13,26 +13,14 @@ const createPassageEditFormOfferTemplate = (offer) => {
   </div>`;
 };
 
-export default class PassageEditFormOffer {
+export default class PassageEditFormOffer extends AbstractView {
   constructor(offer) {
-    this.offer = offer;
+    super();
 
-    this._element = null;
+    this.offer = offer;
   }
 
   getTemplate() {
     return createPassageEditFormOfferTemplate(this.offer);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
