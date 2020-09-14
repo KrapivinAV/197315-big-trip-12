@@ -7,26 +7,24 @@ import NoTripView from "../view/no-trip.js";
 import {render, RenderPosition} from "../utils/render.js";
 
 export default class Trip {
-  constructor(tripMainContainer, tripPassagesContainer, passagesGroups) {
+  constructor(tripMainContainer, tripPassagesContainer) {
     this._tripMainContainer = tripMainContainer;
     this._tripPassagesContainer = tripPassagesContainer;
-    this._passagesGroups = passagesGroups;
 
-    this._tripInfoContainerComponent = new TripInfoContainerView(this._passagesGroups);
     this._mainNavComponent = new MainNavView();
     this._filterComponent = new FilterView();
     this._sorterComponent = new SorterView();
-    this._daysComponent = new DaysView(this._passagesGroups);
     this._noTripComponent = new NoTripView();
   }
 
-  init() {
-    this._renderTripInfo();
+  init(currentPassagesGroups) {
+    this._renderTripInfo(currentPassagesGroups);
     this._renderTripControls();
-    this._renderTripList();
+    this._renderTripList(currentPassagesGroups);
   }
 
-  _renderTripInfo() {
+  _renderTripInfo(currentPassagesGroups) {
+    this._tripInfoContainerComponent = new TripInfoContainerView(currentPassagesGroups);
     this._tripInfoContainerComponent.addParts();
     render(this._tripMainContainer, this._tripInfoContainerComponent, RenderPosition.AFTERBEGIN);
   }
@@ -43,7 +41,8 @@ export default class Trip {
     render(this._tripPassagesContainer, this._sorterComponent);
   }
 
-  _renderDays() {
+  _renderDays(currentPassagesGroups) {
+    this._daysComponent = new DaysView(currentPassagesGroups);
     this._daysComponent.addDays();
     render(this._tripPassagesContainer, this._daysComponent);
   }
@@ -52,13 +51,13 @@ export default class Trip {
     render(this._tripPassagesContainer, this._noTripComponent);
   }
 
-  _renderTripList() {
-    if (!this._passagesGroups.size) {
+  _renderTripList(currentPassagesGroups) {
+    if (!currentPassagesGroups.size) {
       this._renderNoTrip();
       return;
     }
 
     this._renderSorter();
-    this._renderDays();
+    this._renderDays(currentPassagesGroups);
   }
 }

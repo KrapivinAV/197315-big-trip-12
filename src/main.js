@@ -20,8 +20,10 @@ passages.forEach((passage) => {
   }
 });
 
+console.log(passagesGroups);
+
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripPassagesElement = document.querySelector(`.trip-events`);
-const trip = new TripPresenter(tripMainElement, tripPassagesElement, passagesGroups);
+const trip = new TripPresenter(tripMainElement, tripPassagesElement);
 
-trip.init();
+trip.init(passagesGroups);
