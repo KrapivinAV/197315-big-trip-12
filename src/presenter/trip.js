@@ -109,10 +109,12 @@ export default class Trip {
 
     if (this._sorterComponent) {
       this._sorterComponent.getElement().remove();
+      this._sorterComponent.removeElement();
     }
 
     if (this._daysComponent) {
       this._daysComponent.getElement().remove();
+      this._daysComponent.removeElement();
     }
 
     this._renderSorter();
