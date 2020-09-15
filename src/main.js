@@ -5,7 +5,7 @@ const PASSAGE_COUNT = 20;
 
 const passages = new Array(PASSAGE_COUNT).fill().map(generatePassage).sort((a, b) => a.passageStartPoint.getTime() - b.passageStartPoint.getTime());
 const passagesGroups = new Map();
-const passageGroup = new Map();
+const passagesGroup = new Map();
 
 passages.forEach((passage) => {
   const dayStart = passage.passageStartPoint.setHours(0, 0, 0, 0);
@@ -21,10 +21,10 @@ passages.forEach((passage) => {
   }
 });
 
-passageGroup.set(0, passages);
+passagesGroup.set(0, passages);
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripPassagesElement = document.querySelector(`.trip-events`);
 const trip = new TripPresenter(tripMainElement, tripPassagesElement);
 
-trip.init(passagesGroups, passageGroup);
+trip.init(passagesGroups, passagesGroup);

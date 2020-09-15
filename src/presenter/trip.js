@@ -23,9 +23,9 @@ export default class Trip {
   }
 
   init(currentPassagesGroups, currentPassagesGroup) {
-    this._passagesGroups = currentPassagesGroups.slice();
-    this._basisPassagesGroups = currentPassagesGroups.slice();
-    this._passagesGroup = currentPassagesGroup;
+    this._passagesGroups = new Map(currentPassagesGroups);
+    this._basisPassagesGroups = new Map(currentPassagesGroups);
+    this._passagesGroup = new Map(currentPassagesGroup);
 
     this._renderTripInfo(this._passagesGroups);
     this._renderTripControls();
@@ -35,13 +35,14 @@ export default class Trip {
   _sortPassages(sortType) {
     switch (sortType) {
       case SortType.TIME_SORT:
-        this._passagesGroups = this._passagesGroup.sort(sortByTime);
+        this._passagesGroup.set(0, this._passagesGroup.get(0).sort(sortByTime));
+        this._passagesGroups = this._passagesGroup;
         break;
       case SortType.PRICE_SORT:
-        this._passagesGroups = this._passagesGroup.sort(sortByPrice);
+        this._passagesGroups = this._passagesGroup.set(0, this._passagesGroup.get(0).sort(sortByPrice));
         break;
       default:
-        this._passagesGroups = this._basisPassagesGroups.slice();
+        this._passagesGroups = this._basisPassagesGroups;
     }
 
     this._currentSortType = sortType;
