@@ -55,7 +55,7 @@ export default class Trip {
 
     this._sortPassages(sortType);
     this._clearPassagesList();
-    this._renderDays(this._passagesGroups);
+    this._renderTripList(this._passagesGroups);
   }
 
   _renderTripInfo(currentPassagesGroups) {
