@@ -1,7 +1,9 @@
-export const sortTimeUp = (passageA, passageB) => {
-  return passageA.dueDate.getTime() - passageB.dueDate.getTime();
+export const sortByTime = (passageA, passageB) => {
+  const passageADuration = passageA.passageEndPoint - passageA.passageStartPoint;
+  const passageBDuration = passageB.passageEndPoint - passageB.passageStartPoint;
+  return passageADuration - passageBDuration;
 };
 
-export const sortPriceDown = (passageA, passageB) => {
+export const sortByPrice = (passageA, passageB) => {
   return passageA.price - passageB.price;
 };

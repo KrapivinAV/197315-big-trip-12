@@ -5,22 +5,56 @@ import SorterView from "../view/sorter.js";
 import DaysView from "../view/days.js";
 import NoTripView from "../view/no-trip.js";
 import {render, RenderPosition} from "../utils/render.js";
+import {sortByTime, sortByPrice} from "../utils/passage.js";
+import {SortType} from "../basis-constants.js";
 
 export default class Trip {
   constructor(tripMainContainer, tripPassagesContainer) {
     this._tripMainContainer = tripMainContainer;
     this._tripPassagesContainer = tripPassagesContainer;
+    this._currentSortType = SortType.DEFAULT;
 
     this._mainNavComponent = new MainNavView();
     this._filterComponent = new FilterView();
     this._sorterComponent = new SorterView();
     this._noTripComponent = new NoTripView();
+
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(currentPassagesGroups) {
-    this._renderTripInfo(currentPassagesGroups);
+  init(currentPassagesGroups, currentPassagesGroup) {
+    this._passagesGroups = currentPassagesGroups.slice();
+    this._basisPassagesGroups = currentPassagesGroups.slice();
+    this._passagesGroup = currentPassagesGroup;
+
+    this._renderTripInfo(this._passagesGroups);
     this._renderTripControls();
-    this._renderTripList(currentPassagesGroups);
+    this._renderTripList(this._passagesGroups);
+  }
+
+  _sortPassages(sortType) {
+    switch (sortType) {
+      case SortType.TIME_SORT:
+        this._passagesGroups = this._passagesGroup.sort(sortByTime);
+        break;
+      case SortType.PRICE_SORT:
+        this._passagesGroups = this._passagesGroup.sort(sortByPrice);
+        break;
+      default:
+        this._passagesGroups = this._basisPassagesGroups.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortPassages(sortType);
+    this._clearPassagesList();
+    this._renderDays(this._passagesGroups);
   }
 
   _renderTripInfo(currentPassagesGroups) {
@@ -39,6 +73,7 @@ export default class Trip {
 
   _renderSorter() {
     render(this._tripPassagesContainer, this._sorterComponent);
+    this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderDays(currentPassagesGroups) {
@@ -49,6 +84,10 @@ export default class Trip {
 
   _renderNoTrip() {
     render(this._tripPassagesContainer, this._noTripComponent);
+  }
+
+  _clearPassagesList() {
+    this._daysComponent.getElement().innerHTML = ``;
   }
 
   _renderTripList(currentPassagesGroups) {
