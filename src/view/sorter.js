@@ -35,9 +35,10 @@ const createSorterTemplate = (sorterDayTitle) => {
 };
 
 export default class Sorter extends AbstractView {
-  constructor() {
+  constructor(currentSortType) {
     super();
 
+    this.sorterDayTitle = currentSortType !== SortType.DEFAULT ? `` : `DAY`;
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
 
@@ -52,7 +53,6 @@ export default class Sorter extends AbstractView {
 
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
-    this.sorterDayTitle = evt.target.dataset.sortType !== SortType.DEFAULT ? `` : `Day`;
   }
 
   setSortTypeChangeHandler(callback) {

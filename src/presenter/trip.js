@@ -16,7 +16,6 @@ export default class Trip {
 
     this._mainNavComponent = new MainNavView();
     this._filterComponent = new FilterView();
-    this._sorterComponent = new SorterView();
     this._noTripComponent = new NoTripView();
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -50,6 +49,7 @@ export default class Trip {
   }
 
   _sortPassages(sortType) {
+    this._displayPassagesGroups.clear();
     switch (sortType) {
       case SortType.TIME_SORT:
         this._displayPassagesGroups.set(0, this._sourcePassages.sort(sortByTime));
@@ -60,8 +60,6 @@ export default class Trip {
       default:
         this._displayPassagesGroups = new Map(this._sourcePassagesGroups);
     }
-
-    this._currentSortType = sortType;
   }
 
   _handleSortTypeChange(sortType) {
@@ -69,6 +67,7 @@ export default class Trip {
       return;
     }
 
+    this._currentSortType = sortType;
     this._render();
   }
 
@@ -87,15 +86,12 @@ export default class Trip {
   }
 
   _renderSorter() {
+    this._sorterComponent = new SorterView(this._currentSortType);
     render(this._tripPassagesContainer, this._sorterComponent);
     this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderDays(currentPassagesGroups) {
-    if (this._daysComponent) {
-      this._clearPassagesList();
-    }
-
     this._daysComponent = new DaysView(currentPassagesGroups);
     this._daysComponent.addDays();
     render(this._tripPassagesContainer, this._daysComponent);
@@ -105,14 +101,18 @@ export default class Trip {
     render(this._tripPassagesContainer, this._noTripComponent);
   }
 
-  _clearPassagesList() {
-    this._daysComponent.getElement().innerHTML = ``;
-  }
-
   _renderTripList(currentPassagesGroups) {
     if (!currentPassagesGroups.size) {
       this._renderNoTrip();
       return;
+    }
+
+    if (this._sorterComponent) {
+      this._sorterComponent.getElement().remove();
+    }
+
+    if (this._daysComponent) {
+      this._daysComponent.getElement().remove();
     }
 
     this._renderSorter();
