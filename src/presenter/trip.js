@@ -3,7 +3,9 @@ import MainNavView from "../view/main-nav.js";
 import FilterView from "../view/filter.js";
 import SorterView from "../view/sorter.js";
 import DaysView from "../view/days.js";
+import DayView from "./day.js";
 import NoTripView from "../view/no-trip.js";
+import PassagePresenter from "./passage.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {sortByTime, sortByPrice} from "../utils/passage.js";
 import {SortType} from "../basis-constants.js";
@@ -22,6 +24,7 @@ export default class Trip {
 
     this._sorterComponent = null;
     this._daysComponent = null;
+    this._dayComponent = null;
   }
 
   init(currentPassages) {
@@ -67,6 +70,27 @@ export default class Trip {
     }
   }
 
+  _addDays(currentPassagesGroups) {
+    Array.from(currentPassagesGroups.entries()).forEach((dayGroup, index) => {
+      const [dayKey, items] = dayGroup;
+
+      this._dayComponent = new DayView(dayKey, index + 1);
+      this._addPassages(items);
+
+      render(this._daysComponent, this._dayComponent);
+    });
+  }
+
+  _addPassages(items) {
+    items.forEach((item) => this._renderPassage(item));
+  }
+
+  _renderPassage(item) {
+    const dayList = this._dayComponent.getElement().querySelector(`.trip-events__list`);
+    const passagePresenter = new PassagePresenter(dayList);
+    passagePresenter.init(item);
+  }
+
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
@@ -100,8 +124,8 @@ export default class Trip {
 
   _renderDays(currentPassagesGroups) {
     remove(this._daysComponent);
-    this._daysComponent = new DaysView(currentPassagesGroups);
-    this._daysComponent.addDays();
+    this._daysComponent = new DaysView();
+    this._addDays(currentPassagesGroups);
     render(this._tripPassagesContainer, this._daysComponent);
   }
 
