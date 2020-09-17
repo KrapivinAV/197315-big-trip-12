@@ -6,15 +6,23 @@ import PassageEditFormView from "./passage-edit-form.js";
 
 const createDayTemplate = (dayKey, index) => {
 
-  return `<li class="trip-days__item  day">
-    <div class="day__info">
-      <span class="day__counter">${index}</span>
-      <time class="day__date" datetime="${new Date(dayKey).toISOString()}">${new Date(dayKey).toLocaleString(`en-US`, {month: `short`, day: `numeric`})}</time>
-    </div>
+  return dayKey + index !== 1 ?
+    `<li class="trip-days__item  day">
+      <div class="day__info">
+        <span class="day__counter">${index}</span>
+        <time class="day__date" datetime="${new Date(dayKey).toISOString()}">${new Date(dayKey).toLocaleString(`en-US`, {month: `short`, day: `numeric`})}</time>
+      </div>
 
-    <ul class="trip-events__list">
-    </ul>
-  </li>`;
+      <ul class="trip-events__list">
+      </ul>
+    </li>` :
+    `<li class="trip-days__item  day">
+      <div class="day__info">
+      </div>
+
+      <ul class="trip-events__list">
+      </ul>
+    </li>`;
 };
 
 export default class Day extends AbstractView {

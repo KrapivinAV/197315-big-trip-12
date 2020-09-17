@@ -4,29 +4,80 @@ import FilterView from "../view/filter.js";
 import SorterView from "../view/sorter.js";
 import DaysView from "../view/days.js";
 import NoTripView from "../view/no-trip.js";
-import {render, RenderPosition} from "../utils/render.js";
+import {render, RenderPosition, remove} from "../utils/render.js";
+import {sortByTime, sortByPrice} from "../utils/passage.js";
+import {SortType} from "../basis-constants.js";
 
 export default class Trip {
-  constructor(tripMainContainer, tripPassagesContainer, passagesGroups) {
+  constructor(tripMainContainer, tripPassagesContainer) {
     this._tripMainContainer = tripMainContainer;
     this._tripPassagesContainer = tripPassagesContainer;
-    this._passagesGroups = passagesGroups;
+    this._currentSortType = SortType.DEFAULT;
 
-    this._tripInfoContainerComponent = new TripInfoContainerView(this._passagesGroups);
     this._mainNavComponent = new MainNavView();
     this._filterComponent = new FilterView();
-    this._sorterComponent = new SorterView();
-    this._daysComponent = new DaysView(this._passagesGroups);
     this._noTripComponent = new NoTripView();
+
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._sorterComponent = null;
+    this._daysComponent = null;
   }
 
-  init() {
-    this._renderTripInfo();
+  init(currentPassages) {
+    this._sourcePassages = currentPassages.slice();
+    this._displayPassagesGroups = new Map();
+
+    this._renderTripInfo(this._generateDisplayPassagesGroups(this._sourcePassages));
     this._renderTripControls();
-    this._renderTripList();
+    this._render();
   }
 
-  _renderTripInfo() {
+  _generateDisplayPassagesGroups(passages) {
+    const displayPassagesGroups = new Map();
+
+    passages.forEach((passage) => {
+      const dayStart = passage.passageStartPoint.setHours(0, 0, 0, 0);
+
+      if (!displayPassagesGroups.has(dayStart)) {
+        const dayEnd = passage.passageStartPoint.setHours(23, 59, 59, 999);
+
+        const daySet = passages.filter((item) => {
+          const passageStartTime = item.passageStartPoint.getTime();
+          return passageStartTime >= dayStart && passageStartTime <= dayEnd;
+        });
+        displayPassagesGroups.set(dayStart, daySet);
+      }
+    });
+
+    return displayPassagesGroups;
+  }
+
+  _sortPassages(sortType) {
+    this._displayPassagesGroups.clear();
+    switch (sortType) {
+      case SortType.TIME_SORT:
+        this._displayPassagesGroups.set(0, this._sourcePassages.sort(sortByTime));
+        break;
+      case SortType.PRICE_SORT:
+        this._displayPassagesGroups.set(0, this._sourcePassages.sort(sortByPrice));
+        break;
+      default:
+        this._displayPassagesGroups = this._generateDisplayPassagesGroups(this._sourcePassages);
+    }
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+    this._render();
+  }
+
+  _renderTripInfo(currentPassagesGroups) {
+    this._tripInfoContainerComponent = new TripInfoContainerView(currentPassagesGroups);
     this._tripInfoContainerComponent.addParts();
     render(this._tripMainContainer, this._tripInfoContainerComponent, RenderPosition.AFTERBEGIN);
   }
@@ -40,10 +91,16 @@ export default class Trip {
   }
 
   _renderSorter() {
-    render(this._tripPassagesContainer, this._sorterComponent);
+    if (!this._sorterComponent) {
+      this._sorterComponent = new SorterView();
+      render(this._tripPassagesContainer, this._sorterComponent);
+      this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    }
   }
 
-  _renderDays() {
+  _renderDays(currentPassagesGroups) {
+    remove(this._daysComponent);
+    this._daysComponent = new DaysView(currentPassagesGroups);
     this._daysComponent.addDays();
     render(this._tripPassagesContainer, this._daysComponent);
   }
@@ -52,13 +109,21 @@ export default class Trip {
     render(this._tripPassagesContainer, this._noTripComponent);
   }
 
-  _renderTripList() {
-    if (!this._passagesGroups.size) {
+  _renderTripList(currentPassagesGroups) {
+    if (!this._sourcePassages.length) {
+      remove(this._sorterComponent);
+      remove(this._daysComponent);
       this._renderNoTrip();
       return;
     }
 
     this._renderSorter();
-    this._renderDays();
+    this._renderDays(currentPassagesGroups);
+  }
+
+  _render() {
+    this._sortPassages(this._currentSortType);
+    this._renderTripList(this._displayPassagesGroups);
   }
 }
+
