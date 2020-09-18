@@ -72,13 +72,14 @@ export default class Trip {
   }
 
   _sortPassages(sortType) {
+    const currentPassages = this._sourcePassages.slice();
     this._displayPassagesGroups.clear();
     switch (sortType) {
       case SortType.TIME_SORT:
-        this._displayPassagesGroups.set(0, this._sourcePassages.sort(sortByTime));
+        this._displayPassagesGroups.set(0, currentPassages.sort(sortByTime));
         break;
       case SortType.PRICE_SORT:
-        this._displayPassagesGroups.set(0, this._sourcePassages.sort(sortByPrice));
+        this._displayPassagesGroups.set(0, currentPassages.sort(sortByPrice));
         break;
       default:
         this._displayPassagesGroups = this._generateDisplayPassagesGroups(this._sourcePassages);
