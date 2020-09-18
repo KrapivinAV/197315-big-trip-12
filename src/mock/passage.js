@@ -1,11 +1,12 @@
 import {routeParameters} from "../route-parameters.js";
 import {getRandomInteger} from "../utils/common.js";
 
-
 const {arrivals, vehicles, places, descriptionPool, msInOneDay, maxDaysGap, maxPrice, maxPhotoQuantity} = routeParameters;
 
 let waypointTypeCategory;
 let waypointTypeIndex;
+
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateWaypointType = () => {
   waypointTypeCategory = getRandomInteger(0, 1);
@@ -68,6 +69,7 @@ export const generatePassage = () => {
   const price = getRandomInteger(1, maxPrice);
 
   return {
+    id: generateId(),
     waypointType,
     waypoint,
     offers,

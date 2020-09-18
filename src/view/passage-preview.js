@@ -56,6 +56,8 @@ export default class PassagePreview extends AbstractView {
     super();
 
     this.passage = passage;
+
+    this._rollUpClickHandler = this._rollUpClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -69,5 +71,15 @@ export default class PassagePreview extends AbstractView {
       const currentOffer = new PassagePreviewOfferView(offer);
       render(offersList, currentOffer);
     });
+  }
+
+  _rollUpClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.rollUpClick();
+  }
+
+  setRollUpClickHandler(callback) {
+    this._callback.rollUpClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._rollUpClickHandler);
   }
 }

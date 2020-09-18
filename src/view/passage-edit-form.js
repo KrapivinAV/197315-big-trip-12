@@ -13,6 +13,8 @@ export default class PassageEditForm extends AbstractView {
     super();
 
     this.item = item;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
@@ -26,5 +28,15 @@ export default class PassageEditForm extends AbstractView {
 
     render(this, passageEditFormHeader);
     render(this, passageEditFormDetails);
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 }
