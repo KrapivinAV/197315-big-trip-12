@@ -5,14 +5,16 @@ import {render, replace, remove} from "../utils/render.js";
 
 
 export default class Passage {
-  constructor(dayList) {
+  constructor(dayList, changeData) {
     this._dayList = dayList;
+    this._changeData = changeData;
 
     this._passageContainerComponent = null;
     this._passagePreviewComponent = null;
     this._passageEditFormComponent = null;
 
     this._handleRollUpClick = this._handleRollUpClick.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
@@ -20,8 +22,10 @@ export default class Passage {
   init(passage) {
     this._passage = passage;
 
-    this._passageContainerComponent = new PassageContainerView();
-    render(this._dayList, this._passageContainerComponent);
+    if (!this._passageContainerComponent) {
+      this._passageContainerComponent = new PassageContainerView();
+      render(this._dayList, this._passageContainerComponent);
+    }
 
     const previousPassagePreviewComponent = this._passagePreviewComponent;
     const previousPassageEditFormComponent = this._passageEditFormComponent;
@@ -33,6 +37,7 @@ export default class Passage {
     this._passageEditFormComponent.addParts();
 
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
+    this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._passageEditFormComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (previousPassagePreviewComponent === null || previousPassageEditFormComponent === null) {
@@ -80,7 +85,22 @@ export default class Passage {
     this._replacePreviewToForm();
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(passage) {
+    this._changeData(passage);
     this._replaceFormToPreview();
   }
+
+  _handleFavoriteClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._passage,
+            {
+              isFavorite: !this._passage.isFavorite
+            }
+        )
+    );
+  }
 }
+
+

@@ -6,6 +6,7 @@ import DaysView from "../view/days.js";
 import DayView from "../view/day.js";
 import NoTripView from "../view/no-trip.js";
 import PassagePresenter from "./passage.js";
+import {updateItem} from "../utils/common.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {sortByTime, sortByPrice} from "../utils/passage.js";
 import {SortType} from "../basis-constants.js";
@@ -21,6 +22,7 @@ export default class Trip {
     this._filterComponent = new FilterView();
     this._noTripComponent = new NoTripView();
 
+    this._handlePassageChange = this._handlePassageChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._sorterComponent = null;
@@ -131,9 +133,14 @@ export default class Trip {
 
   _renderPassage(item) {
     const dayList = this._dayComponent.getElement().querySelector(`.trip-events__list`);
-    const passagePresenter = new PassagePresenter(dayList);
+    const passagePresenter = new PassagePresenter(dayList, this._handlePassageChange);
     passagePresenter.init(item);
     this._passagePresenters[item.id] = passagePresenter;
+  }
+
+  _handlePassageChange(updatedPassage) {
+    this._sourcePassages = updateItem(this._sourcePassages, updatedPassage);
+    this._passagePresenters[updatedPassage.id].init(updatedPassage);
   }
 
   _renderTripList(currentPassagesGroups) {

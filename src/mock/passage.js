@@ -3,6 +3,9 @@ import {getRandomInteger} from "../utils/common.js";
 
 const {arrivals, vehicles, places, descriptionPool, msInOneDay, maxDaysGap, maxPrice, maxPhotoQuantity} = routeParameters;
 
+console.log(arrivals);
+console.log(vehicles);
+
 let waypointTypeCategory;
 let waypointTypeIndex;
 
@@ -77,6 +80,7 @@ export const generatePassage = () => {
     passageEndPoint,
     description,
     photos,
-    price
+    price,
+    isFavorite: false
   };
 };

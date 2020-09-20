@@ -9,11 +9,12 @@ const createPassageEditFormTemplate = () => {
 };
 
 export default class PassageEditForm extends AbstractView {
-  constructor(item) {
+  constructor(passage) {
     super();
 
-    this.item = item;
+    this.passage = passage;
 
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
@@ -22,17 +23,27 @@ export default class PassageEditForm extends AbstractView {
   }
 
   addParts() {
-    const passageEditFormHeader = new PassageEditFormHeaderView(this.item);
-    const passageEditFormDetails = new PassageEditFormDetailsView(this.item);
+    const passageEditFormHeader = new PassageEditFormHeaderView(this.passage);
+    const passageEditFormDetails = new PassageEditFormDetailsView(this.passage);
     passageEditFormDetails.addParts();
 
     render(this, passageEditFormHeader);
     render(this, passageEditFormDetails);
   }
 
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this.passage);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 
   setFormSubmitHandler(callback) {
