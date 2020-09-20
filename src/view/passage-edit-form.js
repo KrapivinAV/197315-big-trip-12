@@ -1,6 +1,9 @@
 import {routeParameters} from "../route-parameters.js";
 import {basisConstants} from "../basis-constants.js";
 import SmartView from "./smart.js";
+import flatpickr from "flatpickr";
+
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const {arrivals} = basisConstants;
 
@@ -94,12 +97,12 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${passageStartPoint.toLocaleString(`en-GB`, {year: `2-digit`, month: `numeric`, day: `numeric`})} ${passageStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time">
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${passageEndPoint.toLocaleString(`en-GB`, {year: `2-digit`, month: `numeric`, day: `numeric`})} ${passageEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time">
     </div>
 
     <div class="event__field-group  event__field-group--price">
@@ -177,14 +180,20 @@ export default class PassageEditForm extends SmartView {
 
     this._passage = passage;
     this._data = PassageEditForm.parsePassageToData(passage);
+    this._startDatepicker = null;
+    this._endDatepicker = null;
 
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._waypointTypeChangeHandler = this._waypointTypeChangeHandler.bind(this);
     this._waypointChangeHandler = this._waypointChangeHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setStartDatepicker();
+    this._setEndDatepicker();
   }
 
   reset(passage) {
@@ -209,7 +218,47 @@ export default class PassageEditForm extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setStartDatepicker();
+    this._setEndDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  _setStartDatepicker() {
+    this._setDatepicker(this._startDatepicker, `input[id=event-start-time-1]`, this._data.passageStartPoint, this._startDateChangeHandler);
+  }
+
+  _setEndDatepicker() {
+    this._setDatepicker(this._endDatepicker, `input[id=event-end-time-1]`, this._data.passageEndPoint, this._endDateChangeHandler);
+  }
+
+  _setDatepicker(datepicker, elementSelector, basisDate, callback) {
+    if (datepicker) {
+      datepicker.destroy();
+      datepicker = null;
+    }
+
+    datepicker = flatpickr(
+        this.getElement().querySelector(elementSelector),
+        {
+          dateFormat: `d/m/y H:i`,
+          enableTime: true,
+          // time_24hr: true,
+          defaultDate: basisDate,
+          onChange: callback
+        }
+    );
+  }
+
+  _startDateChangeHandler([userDate]) {
+    this.updateData({
+      passageStartPoint: userDate
+    });
+  }
+
+  _endDateChangeHandler([userDate]) {
+    this.updateData({
+      passageEndPoint: userDate
+    });
   }
 
   _setInnerHandlers() {

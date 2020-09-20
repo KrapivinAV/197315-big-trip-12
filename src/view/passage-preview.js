@@ -1,4 +1,5 @@
 import {basisConstants} from "../basis-constants.js";
+import {formatDate} from "../utils/passage.js";
 import PassagePreviewOfferView from "./passage-preview-offer.js";
 import {render} from "../utils/render.js";
 import AbstractView from "./abstract.js";
@@ -11,17 +12,6 @@ const createPassagePreviewTemplate = (passage) => {
 
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
 
-  const generateDuration = (start, end) => {
-    const difference = new Date(end - start);
-    if (difference.getDate()) {
-      return `${difference.getDate()}D ${difference.getHours()}H ${difference.getMinutes()}M`;
-    } else if (difference.getHours()) {
-      return `${difference.getHours()}H ${difference.getMinutes()}M`;
-    } else {
-      return `${difference.getMinutes()}M`;
-    }
-  };
-
   return `<div class="event">
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${waypointType}.png" alt="Event type icon">
@@ -30,11 +20,11 @@ const createPassagePreviewTemplate = (passage) => {
 
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${passageStartPoint.toISOString()}">${passageStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
+        <time class="event__start-time" datetime="${passageStartPoint.toISOString()}">${formatDate(passageStartPoint, `hh:mm`)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${passageEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
+        <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${formatDate(passageEndPoint, `hh:mm`)}</time>
       </p>
-      <p class="event__duration">${generateDuration(passageStartPoint, passageEndPoint)}</p>
+      <p class="event__duration">${formatDate(new Date(passageEndPoint - passageStartPoint), `DD[D] hh[H] mm[M]`)}</p>
     </div>
 
     <p class="event__price">

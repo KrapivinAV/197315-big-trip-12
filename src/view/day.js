@@ -1,4 +1,5 @@
 import AbstractView from "./abstract.js";
+import {formatDate} from "../utils/passage.js";
 
 const createDayTemplate = (dayKey, index) => {
 
@@ -6,7 +7,7 @@ const createDayTemplate = (dayKey, index) => {
     `<li class="trip-days__item  day">
       <div class="day__info">
         <span class="day__counter">${index}</span>
-        <time class="day__date" datetime="${new Date(dayKey).toISOString()}">${new Date(dayKey).toLocaleString(`en-US`, {month: `short`, day: `numeric`})}</time>
+        <time class="day__date" datetime="${new Date(dayKey).toISOString()}">${formatDate(new Date(dayKey), `MMM DD`)}</time>
       </div>
 
       <ul class="trip-events__list">
