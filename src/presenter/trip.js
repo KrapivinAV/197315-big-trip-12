@@ -24,6 +24,7 @@ export default class Trip {
 
     this._handlePassageChange = this._handlePassageChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
 
     this._sorterComponent = null;
     this._daysComponent = null;
@@ -133,9 +134,15 @@ export default class Trip {
 
   _renderPassage(item) {
     const dayList = this._dayComponent.getElement().querySelector(`.trip-events__list`);
-    const passagePresenter = new PassagePresenter(dayList, this._handlePassageChange);
+    const passagePresenter = new PassagePresenter(dayList, this._handlePassageChange, this._handleModeChange);
     passagePresenter.init(item);
     this._passagePresenters[item.id] = passagePresenter;
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._passagePresenters)
+      .forEach((presenter) => presenter.resetView());
   }
 
   _handlePassageChange(updatedPassage) {

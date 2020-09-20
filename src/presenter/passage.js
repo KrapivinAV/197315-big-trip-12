@@ -3,15 +3,21 @@ import PassagePreviewView from "../view/passage-preview.js";
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {render, replace, remove} from "../utils/render.js";
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
 
 export default class Passage {
-  constructor(dayList, changeData) {
+  constructor(dayList, changeData, changeMode) {
     this._dayList = dayList;
     this._changeData = changeData;
+    this._changeMode = changeMode;
 
     this._passageContainerComponent = null;
     this._passagePreviewComponent = null;
     this._passageEditFormComponent = null;
+    this._mode = Mode.DEFAULT;
 
     this._handleRollUpClick = this._handleRollUpClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
@@ -34,7 +40,6 @@ export default class Passage {
     this._passagePreviewComponent.addOffers();
 
     this._passageEditFormComponent = new PassageEditFormView(passage);
-    this._passageEditFormComponent.addParts();
 
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
     this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -45,11 +50,11 @@ export default class Passage {
       return;
     }
 
-    if (this._passageContainerComponent.getElement().contains(previousPassagePreviewComponent.getElement())) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._passagePreviewComponent, previousPassagePreviewComponent);
     }
 
-    if (this._passageContainerComponent.getElement().contains(previousPassageEditFormComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._passageEditFormComponent, previousPassageEditFormComponent);
     }
 
@@ -63,21 +68,30 @@ export default class Passage {
     remove(this._passageContainerComponent);
   }
 
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceFormToPreview();
+    }
+  }
+
   _replacePreviewToForm() {
     replace(this._passageEditFormComponent, this._passagePreviewComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
+    this._changeMode();
+    this._mode = Mode.EDITING;
   }
 
   _replaceFormToPreview() {
     replace(this._passagePreviewComponent, this._passageEditFormComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    this._mode = Mode.DEFAULT;
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
-      replace(this._passagePreviewComponent, this._passageEditFormComponent);
-      document.removeEventListener(`keydown`, this._escKeyDownHandler);
+      this._passageEditFormComponent.reset(this._passage);
+      this._replaceFormToPreview();
     }
   }
 
