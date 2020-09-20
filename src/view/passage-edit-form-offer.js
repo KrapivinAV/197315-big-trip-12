@@ -1,10 +1,10 @@
 import AbstractView from "./abstract.js";
 
-const createPassageEditFormOfferTemplate = (offer) => {
+const createPassageEditFormOfferTemplate = (offer, checkedStatus) => {
   const {title, cost} = offer;
 
   return `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="${title}" type="checkbox" name="${title}">
+    <input class="event__offer-checkbox  visually-hidden" id="${title}" type="checkbox" name="${title}" ${checkedStatus}>
     <label class="event__offer-label" for="${title}">
       <span class="event__offer-title">${title}</span>
       &plus;
@@ -14,13 +14,14 @@ const createPassageEditFormOfferTemplate = (offer) => {
 };
 
 export default class PassageEditFormOffer extends AbstractView {
-  constructor(offer) {
+  constructor(offer, checkedStatus) {
     super();
 
     this.offer = offer;
+    this.checkedStatus = checkedStatus;
   }
 
   getTemplate() {
-    return createPassageEditFormOfferTemplate(this.offer);
+    return createPassageEditFormOfferTemplate(this.offer, this.checkedStatus);
   }
 }

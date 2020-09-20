@@ -1,7 +1,8 @@
 import AbstractView from "./abstract.js";
 
 const createPassageEditFormDetailsDestinationPhotoTemplate = (photo) => {
-  return `<img class="event__photo" src="${photo}" alt="Event photo">`;
+  const {src, description} = photo;
+  return `<img class="event__photo" src="${src}" alt="${description}">`;
 };
 
 export default class PassageEditFormDetailsDestinationPhoto extends AbstractView {
