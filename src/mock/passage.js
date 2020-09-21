@@ -1,11 +1,12 @@
 import {routeParameters} from "../route-parameters.js";
 import {getRandomInteger} from "../utils/common.js";
 
-
 const {arrivals, vehicles, places, descriptionPool, msInOneDay, maxDaysGap, maxPrice, maxPhotoQuantity} = routeParameters;
 
 let waypointTypeCategory;
 let waypointTypeIndex;
+
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateWaypointType = () => {
   waypointTypeCategory = getRandomInteger(0, 1);
@@ -45,16 +46,46 @@ const generatePassageEndPoint = (time, start) => {
 };
 
 const generateDescription = () => {
-  const quantity = getRandomInteger(1, descriptionPool.length);
+  const quantity = getRandomInteger(0, descriptionPool.length);
 
   return new Set(new Array(quantity).fill().map(() => descriptionPool[getRandomInteger(0, descriptionPool.length - 1)]));
 };
 
 const generatePhotos = () => {
-  const quantity = getRandomInteger(1, maxPhotoQuantity);
+  const quantity = getRandomInteger(0, maxPhotoQuantity);
 
-  return new Set(new Array(quantity).fill().map(() => `http://picsum.photos/248/152?r=${Math.random()}`));
+  const photoSet = new Array(quantity);
+
+  for (let i = 0; i < quantity; i++) {
+    const photo = {
+      src: `http://picsum.photos/248/152?r=${Math.random()}`,
+      description: `Описание Фото №${i}`
+    };
+    photoSet.push(photo);
+  }
+
+  return photoSet;
 };
+
+const generateDestinationSet = () => {
+  const destinationSet = [];
+
+  places.forEach((place) => {
+    const destinationItem = {};
+
+    destinationItem.name = place;
+    destinationItem.description = Array.from(generateDescription()).join(`. `);
+    destinationItem.pictures = generatePhotos();
+
+    destinationSet.push(destinationItem);
+  });
+
+  return destinationSet;
+};
+
+const destinationSet = generateDestinationSet();
+
+export const destinationTypeSet = destinationSet.slice();
 
 export const generatePassage = () => {
   const waypointType = generateWaypointType();
@@ -63,11 +94,12 @@ export const generatePassage = () => {
   const currentTime = Date.now();
   const passageStartPoint = generatePassageStartPoint(currentTime);
   const passageEndPoint = generatePassageEndPoint(currentTime, passageStartPoint.getTime());
-  const description = Array.from(generateDescription()).join(`. `);
-  const photos = Array.from(generatePhotos());
+  const description = destinationSet.filter((item) => item.name === waypoint)[0].description;
+  const photos = destinationSet.filter((item) => item.name === waypoint)[0].pictures;
   const price = getRandomInteger(1, maxPrice);
 
   return {
+    id: generateId(),
     waypointType,
     waypoint,
     offers,
@@ -75,6 +107,7 @@ export const generatePassage = () => {
     passageEndPoint,
     description,
     photos,
-    price
+    price,
+    isFavorite: false
   };
 };

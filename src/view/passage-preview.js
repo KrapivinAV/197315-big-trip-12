@@ -1,4 +1,5 @@
-import {basisConstants} from "../basis-constants.js";
+import {basisConstants, typeTranslations} from "../basis-constants.js";
+import {formatDate} from "../utils/passage.js";
 import PassagePreviewOfferView from "./passage-preview-offer.js";
 import {render} from "../utils/render.js";
 import AbstractView from "./abstract.js";
@@ -8,33 +9,22 @@ const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
 const createPassagePreviewTemplate = (passage) => {
   const {waypointType, waypoint, passageStartPoint, passageEndPoint, price} = passage;
-
-  const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
-
-  const generateDuration = (start, end) => {
-    const difference = new Date(end - start);
-    if (difference.getDate()) {
-      return `${difference.getDate()}D ${difference.getHours()}H ${difference.getMinutes()}M`;
-    } else if (difference.getHours()) {
-      return `${difference.getHours()}H ${difference.getMinutes()}M`;
-    } else {
-      return `${difference.getMinutes()}M`;
-    }
-  };
+  const typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
+  const routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
 
   return `<div class="event">
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${waypointType}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${waypointType} ${routePlaceholderPart} ${waypoint}</h3>
+    <h3 class="event__title">${typeTranslations[typeMark]} ${routePlaceholderPart} ${waypoint}</h3>
 
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${passageStartPoint.toISOString()}">${passageStartPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
+        <time class="event__start-time" datetime="${passageStartPoint.toISOString()}">${formatDate(passageStartPoint, `hh:mm`)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${passageEndPoint.toLocaleString(`en-GB`, {hour: `numeric`, minute: `numeric`})}</time>
+        <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${formatDate(passageEndPoint, `hh:mm`)}</time>
       </p>
-      <p class="event__duration">${generateDuration(passageStartPoint, passageEndPoint)}</p>
+      <p class="event__duration">${formatDate(new Date(passageEndPoint - passageStartPoint), `DD[D] hh[H] mm[M]`)}</p>
     </div>
 
     <p class="event__price">
@@ -56,6 +46,8 @@ export default class PassagePreview extends AbstractView {
     super();
 
     this.passage = passage;
+
+    this._rollUpClickHandler = this._rollUpClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -69,5 +61,15 @@ export default class PassagePreview extends AbstractView {
       const currentOffer = new PassagePreviewOfferView(offer);
       render(offersList, currentOffer);
     });
+  }
+
+  _rollUpClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.rollUpClick();
+  }
+
+  setRollUpClickHandler(callback) {
+    this._callback.rollUpClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._rollUpClickHandler);
   }
 }

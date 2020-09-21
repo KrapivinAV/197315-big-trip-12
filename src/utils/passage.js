@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const sortByTime = (passageA, passageB) => {
   const passageADuration = passageA.passageEndPoint - passageA.passageStartPoint;
   const passageBDuration = passageB.passageEndPoint - passageB.passageStartPoint;
@@ -6,4 +8,12 @@ export const sortByTime = (passageA, passageB) => {
 
 export const sortByPrice = (passageA, passageB) => {
   return passageB.price - passageA.price;
+};
+
+export const formatDate = (date, format) => {
+  if (!(date instanceof Date)) {
+    return ``;
+  }
+
+  return moment(date).format(format);
 };
