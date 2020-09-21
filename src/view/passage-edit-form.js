@@ -9,7 +9,7 @@ import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 const {arrivals} = basisConstants;
 
 const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoint, price, isFavorite) => {
-  const routePlaceholderPart = arrivals.includes(currentWaypointType) ? `in` : `to`;
+  const routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === currentWaypointType.toLowerCase()) ? `in` : `to`;
   const checkedStatus = isFavorite ? `checked` : ``;
   const typeMark = currentWaypointType.toLowerCase() === `check-in` ? `checkIn` : currentWaypointType.toLowerCase();
 

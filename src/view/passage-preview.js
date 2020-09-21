@@ -10,7 +10,7 @@ const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 const createPassagePreviewTemplate = (passage) => {
   const {waypointType, waypoint, passageStartPoint, passageEndPoint, price} = passage;
   const typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
-  const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
+  const routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
 
   return `<div class="event">
     <div class="event__type">
