@@ -1,5 +1,6 @@
-import {routeParameters} from "../route-parameters.js";
-import {basisConstants} from "../basis-constants.js";
+import {basisConstants, typeTranslations} from "../basis-constants.js";
+import {offersTypeSet} from "../mock/offers.js";
+import {destinationTypeSet} from "../mock/passage.js";
 import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 
@@ -7,9 +8,10 @@ import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const {arrivals} = basisConstants;
 
-const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoint, passageStartPoint, passageEndPoint, price, isFavorite) => {
+const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoint, price, isFavorite) => {
   const routePlaceholderPart = arrivals.includes(currentWaypointType) ? `in` : `to`;
   const checkedStatus = isFavorite ? `checked` : ``;
+  const typeMark = currentWaypointType.toLowerCase() === `check-in` ? `checkIn` : currentWaypointType.toLowerCase();
 
   return `<header class="event__header">
     <div class="event__type-wrapper">
@@ -82,7 +84,7 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
 
     <div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
-        ${currentWaypointType} ${routePlaceholderPart}
+        ${typeTranslations[typeMark]} ${routePlaceholderPart}
       </label>
       <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentWaypoint}" list="destination-list-1">
       <datalist id="destination-list-1">
@@ -130,17 +132,18 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
   </header>`;
 };
 
-const createPassageEditFormDetailsTemplate = (currentWaypointType, offers, description, photos) => {
-  const offersCategory = arrivals.includes(currentWaypointType) ? routeParameters.arrivals.slice() : routeParameters.vehicles.slice();
-  const offersTypeSet = offersCategory.filter((item) => item.name === currentWaypointType)[0].offerSet;
+const createPassageEditFormDetailsTemplate = (currentWaypointType, currentWaypoint, offers, offersTypes, destinationTypes) => {
+  const typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === currentWaypointType.toLowerCase())[0].offerSet;
+  const currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === currentWaypoint.toLowerCase())[0].description;
+  const currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === currentWaypoint.toLowerCase())[0].pictures;
 
   return `<section class="event__details">
-    ${(offersTypeSet && offersTypeSet.length !== 0) ? `<section class="event__section  event__section--offers">
+    ${(typeOffers && typeOffers.length !== 0) ? `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${offersTypeSet.map((item) => `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="${item.title}" type="checkbox" name="${item.title}" ${offers.includes(item) ? `checked` : ``}>
+        ${typeOffers.map((item) => `<div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="${item.title}" type="checkbox" name="${item.title}" ${offers.some((offer) => offer.title.toLowerCase() === item.title.toLowerCase()) ? `checked` : ``}>
           <label class="event__offer-label" for="${item.title}">
             <span class="event__offer-title">${item.title}</span>
             &plus;
@@ -149,13 +152,13 @@ const createPassageEditFormDetailsTemplate = (currentWaypointType, offers, descr
         </div>`).join(``)}
       </div>
     </section>` : ``}
-    ${(description || (photos && photos.length !== 0)) ? `<section class="event__section  event__section--destination">
+    ${(currentDescription || (currentPhotos && currentPhotos.length !== 0)) ? `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${description}</p>
+      <p class="event__destination-description">${currentDescription}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${photos.map((item) => `<img class="event__photo" src="${item.src}" alt="${item.description}">`).join(``)}
+          ${currentPhotos.map((item) => `<img class="event__photo" src="${item.src}" alt="${item.description}">`).join(``)}
         </div>
       </div>
     </section>` : ``}
@@ -163,10 +166,10 @@ const createPassageEditFormDetailsTemplate = (currentWaypointType, offers, descr
 };
 
 const createPassageEditFormTemplate = (data) => {
-  const {currentWaypointType, currentWaypoint, passageStartPoint, passageEndPoint, price, isFavorite, offers, description, photos} = data;
+  const {currentWaypointType, currentWaypoint, price, isFavorite, offers} = data;
 
-  const headerTemplate = createPassageEditFormHeaderTemplate(currentWaypointType, currentWaypoint, passageStartPoint, passageEndPoint, price, isFavorite);
-  const detailTemplate = createPassageEditFormDetailsTemplate(currentWaypointType, offers, description, photos);
+  const headerTemplate = createPassageEditFormHeaderTemplate(currentWaypointType, currentWaypoint, price, isFavorite);
+  const detailTemplate = createPassageEditFormDetailsTemplate(currentWaypointType, currentWaypoint, offers, offersTypeSet, destinationTypeSet);
 
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
     ${headerTemplate}

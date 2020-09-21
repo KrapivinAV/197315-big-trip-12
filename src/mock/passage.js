@@ -54,12 +54,15 @@ const generateDescription = () => {
 const generatePhotos = () => {
   const quantity = getRandomInteger(0, maxPhotoQuantity);
 
-  const photoSet = new Array(quantity).fill({});
+  const photoSet = new Array(quantity);
 
-  photoSet.forEach((item, index) => {
-    item.src = `http://picsum.photos/248/152?r=${Math.random()}`;
-    item.description = `Описание Фото №${index}`;
-  });
+  for (let i = 0; i < quantity; i++) {
+    const photo = {
+      src: `http://picsum.photos/248/152?r=${Math.random()}`,
+      description: `Описание Фото №${i}`
+    };
+    photoSet.push(photo);
+  }
 
   return photoSet;
 };
@@ -81,6 +84,8 @@ const generateDestinationSet = () => {
 };
 
 const destinationSet = generateDestinationSet();
+
+export const destinationTypeSet = destinationSet.slice();
 
 export const generatePassage = () => {
   const waypointType = generateWaypointType();

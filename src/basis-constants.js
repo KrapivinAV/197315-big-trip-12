@@ -9,3 +9,16 @@ export const SortType = {
   PRICE_SORT: `price-sort`,
   TIME_SORT: `time-sort`
 };
+
+export const typeTranslations = {
+  taxi: `Taxi`,
+  bus: `Bus`,
+  train: `Train`,
+  ship: `Ship`,
+  transport: `Transport`,
+  flight: `Flight`,
+  drive: `Drive`,
+  checkIn: `Check-in`,
+  sightseeing: `Sightseeing`,
+  restaurant: `Restaurant`
+};

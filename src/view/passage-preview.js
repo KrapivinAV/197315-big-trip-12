@@ -1,4 +1,4 @@
-import {basisConstants} from "../basis-constants.js";
+import {basisConstants, typeTranslations} from "../basis-constants.js";
 import {formatDate} from "../utils/passage.js";
 import PassagePreviewOfferView from "./passage-preview-offer.js";
 import {render} from "../utils/render.js";
@@ -9,14 +9,14 @@ const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 
 const createPassagePreviewTemplate = (passage) => {
   const {waypointType, waypoint, passageStartPoint, passageEndPoint, price} = passage;
-
+  const typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
   const routePlaceholderPart = arrivals.includes(waypointType) ? `in` : `to`;
 
   return `<div class="event">
     <div class="event__type">
       <img class="event__type-icon" width="42" height="42" src="img/icons/${waypointType}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${waypointType} ${routePlaceholderPart} ${waypoint}</h3>
+    <h3 class="event__title">${typeTranslations[typeMark]} ${routePlaceholderPart} ${waypoint}</h3>
 
     <div class="event__schedule">
       <p class="event__time">
