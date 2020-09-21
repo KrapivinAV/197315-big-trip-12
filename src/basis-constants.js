@@ -22,3 +22,15 @@ export const typeTranslations = {
   sightseeing: `Sightseeing`,
   restaurant: `Restaurant`
 };
+
+export const UserAction = {
+  UPDATE_PASSAGE: `UPDATE_PASSAGE`,
+  ADD_PASSAGE: `ADD_PASSAGE`,
+  DELETE_PASSAGE: `DELETE_PASSAGE`
+};
+
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};

@@ -2,6 +2,7 @@ import PassageContainerView from "../view/passage-container.js";
 import PassagePreviewView from "../view/passage-preview.js";
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {render, replace, remove} from "../utils/render.js";
+import {UserAction, UpdateType} from "../basis-constants.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -100,12 +101,18 @@ export default class Passage {
   }
 
   _handleFormSubmit(passage) {
-    this._changeData(passage);
+    this._changeData(
+        UserAction.UPDATE_PASSAGE,
+        UpdateType.MINOR,
+        passage
+    );
     this._replaceFormToPreview();
   }
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_PASSAGE,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._passage,
