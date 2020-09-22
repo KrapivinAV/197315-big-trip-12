@@ -1,6 +1,4 @@
 import {basisConstants, typeTranslations} from "../basis-constants.js";
-import {offersTypeSet} from "../mock/offers.js";
-import {destinationTypeSet} from "../mock/passage.js";
 import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 
@@ -165,7 +163,7 @@ const createPassageEditFormDetailsTemplate = (currentWaypointType, currentWaypoi
   </section>`;
 };
 
-const createPassageEditFormTemplate = (data) => {
+const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) => {
   const {currentWaypointType, currentWaypoint, price, isFavorite, offers} = data;
 
   const headerTemplate = createPassageEditFormHeaderTemplate(currentWaypointType, currentWaypoint, price, isFavorite);
@@ -178,10 +176,12 @@ const createPassageEditFormTemplate = (data) => {
 };
 
 export default class PassageEditForm extends SmartView {
-  constructor(passage) {
+  constructor(passage, offersSet, destinationsSet) {
     super();
 
     this._passage = passage;
+    this._offersSet = offersSet;
+    this._destinationsSet = destinationsSet;
     this._data = PassageEditForm.parsePassageToData(passage);
     this._startDatepicker = null;
     this._endDatepicker = null;
@@ -206,7 +206,7 @@ export default class PassageEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createPassageEditFormTemplate(this._data);
+    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet);
   }
 
   _favoriteClickHandler(evt) {

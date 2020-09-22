@@ -11,10 +11,12 @@ import {sortByTime, sortByPrice} from "../utils/passage.js";
 import {SortType, UpdateType, UserAction} from "../basis-constants.js";
 
 export default class Trip {
-  constructor(tripMainContainer, tripPassagesContainer, passagesModel) {
+  constructor(tripMainContainer, tripPassagesContainer, passagesModel, offersModel, destinationsModel) {
     this._tripMainContainer = tripMainContainer;
     this._tripPassagesContainer = tripPassagesContainer;
     this._passagesModel = passagesModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._currentSortType = SortType.DEFAULT;
     this._passagePresenters = {};
 
@@ -133,7 +135,7 @@ export default class Trip {
 
   _renderPassage(item) {
     const dayList = this._dayComponent.getElement().querySelector(`.trip-events__list`);
-    const passagePresenter = new PassagePresenter(dayList, this._handleViewAction, this._handleModeChange);
+    const passagePresenter = new PassagePresenter(dayList, this._handleViewAction, this._handleModeChange, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
     passagePresenter.init(item);
     this._passagePresenters[item.id] = passagePresenter;
   }
@@ -161,7 +163,7 @@ export default class Trip {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._passagePresenter[data.id].init(data);
+        this._passagePresenters[data.id].init(data);
         break;
       case UpdateType.MINOR:
         this._render();

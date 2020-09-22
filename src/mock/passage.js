@@ -85,7 +85,7 @@ const generateDestinationSet = () => {
 
 const destinationSet = generateDestinationSet();
 
-export const destinationTypeSet = destinationSet.slice();
+export const destinationTypes = destinationSet.slice();
 
 export const generatePassage = () => {
   const waypointType = generateWaypointType();

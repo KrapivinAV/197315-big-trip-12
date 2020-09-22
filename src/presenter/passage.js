@@ -10,10 +10,12 @@ const Mode = {
 };
 
 export default class Passage {
-  constructor(dayList, changeData, changeMode) {
+  constructor(dayList, changeData, changeMode, offersSet, destinationsSet) {
     this._dayList = dayList;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersSet = offersSet;
+    this._destinationsSet = destinationsSet;
 
     this._passageContainerComponent = null;
     this._passagePreviewComponent = null;
@@ -40,7 +42,7 @@ export default class Passage {
     this._passagePreviewComponent = new PassagePreviewView(passage);
     this._passagePreviewComponent.addOffers();
 
-    this._passageEditFormComponent = new PassageEditFormView(passage);
+    this._passageEditFormComponent = new PassageEditFormView(passage, this._offersSet, this._destinationsSet);
 
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
     this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -112,7 +114,7 @@ export default class Passage {
   _handleFavoriteClick() {
     this._changeData(
         UserAction.UPDATE_PASSAGE,
-        UpdateType.MINOR,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._passage,
