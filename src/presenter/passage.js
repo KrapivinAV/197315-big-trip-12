@@ -26,6 +26,7 @@ export default class Passage {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(passage) {
@@ -47,6 +48,7 @@ export default class Passage {
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
     this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._passageEditFormComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._passageEditFormComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (previousPassagePreviewComponent === null || previousPassageEditFormComponent === null) {
       render(this._passageContainerComponent, this._passagePreviewComponent);
@@ -102,13 +104,26 @@ export default class Passage {
     this._replacePreviewToForm();
   }
 
-  _handleFormSubmit(passage) {
+  _handleFormSubmit(update) {
+    const isMinorUpdate =
+      this._passage.passageStartPoint !== update.passageStartPoint ||
+      this._passage.passageEndPoint !== update.passageEndPoint ||
+      this._passage.price !== update.price;
+
     this._changeData(
         UserAction.UPDATE_PASSAGE,
+        isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+        update
+    );
+    this._replaceFormToPreview();
+  }
+
+  _handleDeleteClick(passage) {
+    this._changeData(
+        UserAction.DELETE_PASSAGE,
         UpdateType.MINOR,
         passage
     );
-    this._replaceFormToPreview();
   }
 
   _handleFavoriteClick() {
