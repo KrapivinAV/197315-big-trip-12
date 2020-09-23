@@ -15,7 +15,6 @@ const BLANK_PASSAGE = {
 };
 
 const {arrivals} = basisConstants;
-let availableOffersCheckedStatus = {};
 
 const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite) => {
   let routePlaceholderPart = ``;
@@ -261,7 +260,7 @@ export default class PassageEditForm extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data, this._offersSet));
+    this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data));
   }
 
   restoreHandlers() {
@@ -321,10 +320,12 @@ export default class PassageEditForm extends SmartView {
     .querySelector(`.event__input--price`)
     .addEventListener(`input`, this._priceInputHandler);
 
-    const availableOffersContainer = this.getElement().querySelector(`.event__available-offers`);
+    if (this.getElement().querySelector(`.event__offer-checkbox`)) {
+      const availableOffers = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`));
 
-    if (availableOffersContainer) {
-      availableOffersContainer.addEventListener(`click`, this._availableOffersHandler);
+      availableOffers.forEach((item) => {
+        item.addEventListener(`change`, this._availableOffersHandler);
+      });
     }
   }
 
@@ -337,16 +338,14 @@ export default class PassageEditForm extends SmartView {
 
   _availableOffersHandler(evt) {
     evt.preventDefault();
-    const currentTarget = evt.target.tagName === `SPAN` ? evt.target.parentElement : evt.target;
-    const typeOffers = this._offersSet.filter((item) => item.name.toLowerCase() === currentTarget.dataset.waypointType.toLowerCase())[0].offerSet;
-    typeOffers.forEach((item) => {
-      availableOffersCheckedStatus[item.title] = this._data.offers.some((offer) => offer.title.toLowerCase() === item.title.toLowerCase());
-      return item;
-    });
+    const currentOffersSet = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox:checked`));
+    const typeOffers = this._offersSet.filter((item) => item.name.toLowerCase() === this._data.waypointType.toLowerCase())[0].offerSet;
 
-    availableOffersCheckedStatus[currentTarget.getAttribute(`for`)] = !availableOffersCheckedStatus[currentTarget.getAttribute(`for`)];
-    this.updateData({
-      availableOffersCheckedStatus
+    this._data.offers = [];
+
+    currentOffersSet.forEach((element) => {
+      const currentOffer = typeOffers.filter((item) => item.title === element.name)[0];
+      this._data.offers.push(currentOffer);
     });
   }
 
@@ -362,6 +361,7 @@ export default class PassageEditForm extends SmartView {
 
   _waypointTypeChangeHandler(evt) {
     evt.preventDefault();
+    this._data.offers = [];
     this.updateData({
       waypointType: evt.target.value
     });
@@ -376,7 +376,7 @@ export default class PassageEditForm extends SmartView {
 
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(PassageEditForm.parseDataToPassage(this._data, this._offersSet));
+    this._callback.deleteClick(PassageEditForm.parseDataToPassage(this._data));
   }
 
   setDeleteClickHandler(callback) {
@@ -387,27 +387,12 @@ export default class PassageEditForm extends SmartView {
   static parsePassageToData(passage) {
     return Object.assign(
         {},
-        passage,
-        {
-          availableOffersCheckedStatus
-        }
+        passage
     );
   }
 
-  static parseDataToPassage(data, basisOffersSet) {
-    data.offers = [];
-    const typeOffers = basisOffersSet.filter((item) => item.name.toLowerCase() === data.waypointType.toLowerCase())[0].offerSet;
-    typeOffers.forEach((item) => {
-      if (availableOffersCheckedStatus[item.title]) {
-        data.offers.push(item);
-      }
-      return item;
-    });
-
+  static parseDataToPassage(data) {
     data = Object.assign({}, data);
-
-    availableOffersCheckedStatus = {};
-
     return data;
   }
 }
