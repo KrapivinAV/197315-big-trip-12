@@ -377,6 +377,8 @@ export default class PassageEditForm extends SmartView {
       evt.target.setCustomValidity(``);
     }
 
+    this.getElement().reportValidity();
+
     this.updateData({
       waypoint: evt.target.value
     });
