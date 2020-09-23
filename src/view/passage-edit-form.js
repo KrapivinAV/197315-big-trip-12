@@ -1,5 +1,8 @@
 import {basisConstants, typeTranslations} from "../basis-constants.js";
+import {routeParameters} from "../route-parameters.js";
 import SmartView from "./smart.js";
+
+import he from "he";
 import flatpickr from "flatpickr";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
@@ -70,7 +73,7 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
             <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
           </div>
         </fieldset>
@@ -100,12 +103,9 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
       <label class="event__label  event__type-output" for="event-destination-1">
         ${typeTranslations[typeMark]} ${routePlaceholderPart}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${waypoint}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(waypoint)}" list="destination-list-1" required>
       <datalist id="destination-list-1">
-        <option value="Amsterdam"></option>
-        <option value="Geneva"></option>
-        <option value="Chamonix"></option>
-        <option value="Saint Petersburg"></option>
+        ${routeParameters.places.map((item) => `<option value="${item}"></option>`).join(``)}}
       </datalist>
     </div>
 
@@ -126,7 +126,7 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+      <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" required>
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -369,6 +369,14 @@ export default class PassageEditForm extends SmartView {
 
   _waypointChangeHandler(evt) {
     evt.preventDefault();
+
+    if (!routeParameters.places.some((item) => item === evt.target.value)) {
+      evt.target.value = ``;
+      evt.target.setCustomValidity(`Данный пункт назначения недоступен.`);
+    } else {
+      evt.target.setCustomValidity(``);
+    }
+
     this.updateData({
       waypoint: evt.target.value
     });
