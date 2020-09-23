@@ -43,7 +43,7 @@ export default class Passage {
     this._passagePreviewComponent = new PassagePreviewView(passage);
     this._passagePreviewComponent.addOffers();
 
-    this._passageEditFormComponent = new PassageEditFormView(passage, this._offersSet, this._destinationsSet);
+    this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, passage);
 
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
     this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);

@@ -11,6 +11,7 @@ export const SortType = {
 };
 
 export const typeTranslations = {
+  null: `Bus to`,
   taxi: `Taxi`,
   bus: `Bus`,
   train: `Train`,

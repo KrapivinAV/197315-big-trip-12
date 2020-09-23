@@ -45,3 +45,8 @@ const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, 
 
 filterPresenter.init();
 trip.init();
+
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  trip.createPassage();
+});

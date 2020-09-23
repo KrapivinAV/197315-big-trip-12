@@ -3,10 +3,11 @@ import DaysView from "../view/days.js";
 import DayView from "../view/day.js";
 import NoTripView from "../view/no-trip.js";
 import PassagePresenter from "./passage.js";
+import PassageNewPresenter from "./passage-new.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
-import {SortType, UpdateType, UserAction} from "../basis-constants.js";
+import {SortType, UpdateType, UserAction, FilterType} from "../basis-constants.js";
 
 export default class Trip {
   constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel) {
@@ -31,12 +32,20 @@ export default class Trip {
 
     this._passagesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._passageNewPresenter = null;
   }
 
   init() {
     this._displayPassagesGroups = new Map();
 
     this._render();
+  }
+
+  createPassage() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._passageNewPresenter.init();
   }
 
   _getPassages() {
@@ -103,6 +112,7 @@ export default class Trip {
     if (!this._daysComponent) {
       this._daysComponent = new DaysView();
       render(this._tripPassagesContainer, this._daysComponent);
+      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
     }
   }
 
@@ -129,6 +139,7 @@ export default class Trip {
   }
 
   _handleModeChange() {
+    this._passageNewPresenter.destroy();
     Object
       .values(this._passagePresenters)
       .forEach((presenter) => presenter.resetView());
@@ -178,6 +189,10 @@ export default class Trip {
   }
 
   _clearTripList(resetSortType) {
+    if (this._passageNewPresenter) {
+      this._passageNewPresenter.destroy();
+    }
+
     Object
       .values(this._passagePresenters)
       .forEach((presenter) => presenter.destroy());

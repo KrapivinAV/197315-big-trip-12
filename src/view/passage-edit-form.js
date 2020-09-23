@@ -4,19 +4,35 @@ import flatpickr from "flatpickr";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
+const BLANK_PASSAGE = {
+  isFavorite: false,
+  offers: [],
+  passageEndPoint: new Date(),
+  passageStartPoint: new Date(),
+  price: ``,
+  waypoint: ``,
+  waypointType: ``
+};
+
 const {arrivals} = basisConstants;
 let availableOffersCheckedStatus = {};
 
 const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite) => {
-  const routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
-  const checkedStatus = isFavorite ? `checked` : ``;
-  const typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
+  let routePlaceholderPart = ``;
+  let checkedStatus = ``;
+  let typeMark = null;
+
+  if (waypointType !== ``) {
+    routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
+    checkedStatus = isFavorite ? `checked` : ``;
+    typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
+  }
 
   return `<header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="img/icons/${waypointType}.png" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="img/icons/${waypointType !== `` ? waypointType : `bus`}.png" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -115,15 +131,17 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__reset-btn" type="reset">${waypointType !== `` ? `Delete` : `Cancel`}</button>
 
-    <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checkedStatus}>
+    ${waypointType !== `` ?
+    `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checkedStatus}>
     <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
         <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
       </svg>
-    </label>
+    </label>` :
+    ``}
 
     <button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
@@ -132,9 +150,19 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
 };
 
 const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, offersTypes, destinationTypes) => {
-  const typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === waypointType.toLowerCase())[0].offerSet;
-  const currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].description;
-  const currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].pictures;
+  let typeOffers = null;
+
+  if (waypointType !== ``) {
+    typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === waypointType.toLowerCase())[0].offerSet;
+  }
+
+  let currentDescription = null;
+  let currentPhotos = null;
+
+  if (waypoint !== ``) {
+    currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].description;
+    currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].pictures;
+  }
 
   return `<section class="event__details">
     ${(typeOffers && typeOffers.length !== 0) ? `<section class="event__section  event__section--offers">
@@ -177,7 +205,7 @@ const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) 
 };
 
 export default class PassageEditForm extends SmartView {
-  constructor(passage, offersSet, destinationsSet) {
+  constructor(offersSet, destinationsSet, passage = BLANK_PASSAGE) {
     super();
 
     this._passage = passage;
@@ -292,9 +320,12 @@ export default class PassageEditForm extends SmartView {
     this.getElement()
     .querySelector(`.event__input--price`)
     .addEventListener(`input`, this._priceInputHandler);
-    this.getElement()
-    .querySelector(`.event__available-offers`)
-    .addEventListener(`click`, this._availableOffersHandler);
+
+    const availableOffersContainer = this.getElement().querySelector(`.event__available-offers`);
+
+    if (availableOffersContainer) {
+      availableOffersContainer.addEventListener(`click`, this._availableOffersHandler);
+    }
   }
 
   _priceInputHandler(evt) {
