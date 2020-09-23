@@ -263,7 +263,7 @@ export default class PassageEditForm extends SmartView {
         {
           dateFormat: `d/m/y H:i`,
           enableTime: true,
-          // time_24hr: true,
+          [`time_24hr`]: true,
           defaultDate: basisDate,
           onChange: callback
         }

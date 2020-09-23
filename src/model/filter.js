@@ -4,7 +4,7 @@ import {FilterType} from "../basis-constants.js";
 export default class Filter extends Observer {
   constructor() {
     super();
-    this._activeFilter = FilterType.ALL;
+    this._activeFilter = FilterType.EVERYTHING;
   }
 
   setFilter(updateType, filter) {

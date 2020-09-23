@@ -3,7 +3,7 @@ import {SortType} from "../basis-constants.js";
 
 const createSorterTemplate = (currentSortType) => {
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    <span class="trip-sort__item  trip-sort__item--day">DAY</span>
+    <span class="trip-sort__item  trip-sort__item--day">${currentSortType === SortType.DEFAULT ? `DAY` : ``}</span>
 
     <div class="trip-sort__item  trip-sort__item--event">
       <input id="sort-event" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-event" ${currentSortType === SortType.DEFAULT ? `checked` : ``}>
@@ -54,10 +54,6 @@ export default class Sorter extends AbstractView {
 
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
-    this.getElement().querySelector(`.trip-sort__item--day`).textContent = evt.target.dataset.sortType !== SortType.DEFAULT ? `` : `DAY`;
-
-    // const mark = evt.target.getAttribute(`for`);
-    // this.getElement().querySelector(`input[id=${mark}]`).checked = true;
   }
 
   setSortTypeChangeHandler(callback) {

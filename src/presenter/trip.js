@@ -85,11 +85,14 @@ export default class Trip {
   }
 
   _renderSorter() {
-    if (!this._sorterComponent) {
-      this._sorterComponent = new SorterView();
-      render(this._tripPassagesContainer, this._sorterComponent);
-      this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    if (this._sorterComponent !== null) {
+      remove(this._sorterComponent);
+      this._sorterComponent = null;
     }
+
+    this._sorterComponent = new SorterView(this._currentSortType);
+    render(this._tripPassagesContainer, this._sorterComponent);
+    this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderNoTrip() {
@@ -182,6 +185,8 @@ export default class Trip {
 
     if (this._daysComponent) {
       Array.from(this._daysComponent.getElement().querySelectorAll(`.trip-days__item`)).forEach((item) => item.remove());
+      remove(this._daysComponent);
+      this._daysComponent = null;
     }
 
     if (resetSortType) {
