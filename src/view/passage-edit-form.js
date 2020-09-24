@@ -19,7 +19,7 @@ const BLANK_PASSAGE = {
 
 const {arrivals} = basisConstants;
 
-const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite) => {
+const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite, formType) => {
   let routePlaceholderPart = ``;
   let checkedStatus = ``;
   let typeMark = null;
@@ -130,9 +130,9 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">${waypointType !== `` ? `Delete` : `Cancel`}</button>
+    <button class="event__reset-btn" type="reset">${formType === `EDIT_PASSAGE` ? `Delete` : `Cancel`}</button>
 
-    ${waypointType !== `` ?
+    ${formType === `EDIT_PASSAGE` ?
     `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checkedStatus}>
     <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -191,10 +191,10 @@ const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, of
   </section>`;
 };
 
-const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) => {
+const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet, formType) => {
   const {waypointType, waypoint, price, isFavorite, offers} = data;
 
-  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite);
+  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite, formType);
   const detailTemplate = createPassageEditFormDetailsTemplate(waypointType, waypoint, offers, offersTypeSet, destinationTypeSet);
 
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -204,12 +204,13 @@ const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) 
 };
 
 export default class PassageEditForm extends SmartView {
-  constructor(offersSet, destinationsSet, passage = BLANK_PASSAGE) {
+  constructor(offersSet, destinationsSet, formType, passage = BLANK_PASSAGE) {
     super();
 
     this._passage = passage;
     this._offersSet = offersSet;
     this._destinationsSet = destinationsSet;
+    this._formType = formType;
     this._data = PassageEditForm.parsePassageToData(passage);
     this._startDatepicker = null;
     this._endDatepicker = null;
@@ -250,7 +251,7 @@ export default class PassageEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet);
+    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet, this._formType);
   }
 
   _favoriteClickHandler(evt) {
