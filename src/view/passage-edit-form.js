@@ -254,6 +254,10 @@ export default class PassageEditForm extends SmartView {
     return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet, this._formType);
   }
 
+  // setNewPassageButtonDisabled() {
+  //   this.getElement().querySelector(``)
+  // }
+
   _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoriteClick();
@@ -261,6 +265,11 @@ export default class PassageEditForm extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
+
+    if (this._data.waypointType === ``) {
+      this._data.waypointType = `bus`;
+    }
+
     if (this.getElement().checkValidity()) {
       this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data));
     }
@@ -321,7 +330,7 @@ export default class PassageEditForm extends SmartView {
     .addEventListener(`change`, this._waypointChangeHandler);
     this.getElement()
     .querySelector(`.event__input--price`)
-    .addEventListener(`input`, this._priceInputHandler);
+    .addEventListener(`change`, this._priceInputHandler);
 
     if (this.getElement().querySelector(`.event__offer-checkbox`)) {
       const availableOffers = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`));
@@ -334,6 +343,17 @@ export default class PassageEditForm extends SmartView {
 
   _priceInputHandler(evt) {
     evt.preventDefault();
+
+    const isValid = +evt.target.value === parseInt(evt.target.value, 10) && +evt.target.value >= 0;
+    const massage = !isValid ? `Введите целое положительное число.` : ``;
+
+    evt.target.setCustomValidity(massage);
+    this.getElement().reportValidity();
+
+    if (!isValid) {
+      return;
+    }
+
     this.updateData({
       price: evt.target.value
     }, true);

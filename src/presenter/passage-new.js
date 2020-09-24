@@ -25,6 +25,7 @@ export default class PassageNew {
     this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, FormType.CREATE_PASSAGE);
     this._passageEditFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._passageEditFormComponent.setDeleteClickHandler(this._handleCancelClick);
+    // this._passageEditFormComponent.setNewPassageButtonDisabled();
 
     render(this._tripPassagesContainer, this._passageEditFormComponent, RenderPosition.AFTERBEGIN);
 
