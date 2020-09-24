@@ -1,23 +1,40 @@
 import {basisConstants, typeTranslations} from "../basis-constants.js";
-import {offersTypeSet} from "../mock/offers.js";
-import {destinationTypeSet} from "../mock/passage.js";
+import {routeParameters} from "../route-parameters.js";
 import SmartView from "./smart.js";
+
+import he from "he";
 import flatpickr from "flatpickr";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
+const BLANK_PASSAGE = {
+  isFavorite: false,
+  offers: [],
+  passageEndPoint: new Date(),
+  passageStartPoint: new Date(),
+  price: ``,
+  waypoint: ``,
+  waypointType: ``
+};
+
 const {arrivals} = basisConstants;
 
-const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoint, price, isFavorite) => {
-  const routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === currentWaypointType.toLowerCase()) ? `in` : `to`;
-  const checkedStatus = isFavorite ? `checked` : ``;
-  const typeMark = currentWaypointType.toLowerCase() === `check-in` ? `checkIn` : currentWaypointType.toLowerCase();
+const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite) => {
+  let routePlaceholderPart = ``;
+  let checkedStatus = ``;
+  let typeMark = null;
+
+  if (waypointType !== ``) {
+    routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
+    checkedStatus = isFavorite ? `checked` : ``;
+    typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
+  }
 
   return `<header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="img/icons/${currentWaypointType}.png" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="img/icons/${waypointType !== `` ? waypointType : `bus`}.png" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -56,7 +73,7 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
             <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
           </div>
         </fieldset>
@@ -86,12 +103,9 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
       <label class="event__label  event__type-output" for="event-destination-1">
         ${typeTranslations[typeMark]} ${routePlaceholderPart}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentWaypoint}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(waypoint)}" list="destination-list-1" required>
       <datalist id="destination-list-1">
-        <option value="Amsterdam"></option>
-        <option value="Geneva"></option>
-        <option value="Chamonix"></option>
-        <option value="Saint Petersburg"></option>
+        ${routeParameters.places.map((item) => `<option value="${item}"></option>`).join(``)}}
       </datalist>
     </div>
 
@@ -112,19 +126,21 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+      <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" required>
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__reset-btn" type="reset">${waypointType !== `` ? `Delete` : `Cancel`}</button>
 
-    <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checkedStatus}>
+    ${waypointType !== `` ?
+    `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checkedStatus}>
     <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
         <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
       </svg>
-    </label>
+    </label>` :
+    ``}
 
     <button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
@@ -132,10 +148,20 @@ const createPassageEditFormHeaderTemplate = (currentWaypointType, currentWaypoin
   </header>`;
 };
 
-const createPassageEditFormDetailsTemplate = (currentWaypointType, currentWaypoint, offers, offersTypes, destinationTypes) => {
-  const typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === currentWaypointType.toLowerCase())[0].offerSet;
-  const currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === currentWaypoint.toLowerCase())[0].description;
-  const currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === currentWaypoint.toLowerCase())[0].pictures;
+const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, offersTypes, destinationTypes) => {
+  let typeOffers = null;
+
+  if (waypointType !== ``) {
+    typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === waypointType.toLowerCase())[0].offerSet;
+  }
+
+  let currentDescription = null;
+  let currentPhotos = null;
+
+  if (waypoint !== ``) {
+    currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].description;
+    currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].pictures;
+  }
 
   return `<section class="event__details">
     ${(typeOffers && typeOffers.length !== 0) ? `<section class="event__section  event__section--offers">
@@ -144,7 +170,7 @@ const createPassageEditFormDetailsTemplate = (currentWaypointType, currentWaypoi
       <div class="event__available-offers">
         ${typeOffers.map((item) => `<div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="${item.title}" type="checkbox" name="${item.title}" ${offers.some((offer) => offer.title.toLowerCase() === item.title.toLowerCase()) ? `checked` : ``}>
-          <label class="event__offer-label" for="${item.title}">
+          <label class="event__offer-label" for="${item.title}" data-waypoint-type="${waypointType}">
             <span class="event__offer-title">${item.title}</span>
             &plus;
             &euro;&nbsp;<span class="event__offer-price">${item.cost}</span>
@@ -165,11 +191,11 @@ const createPassageEditFormDetailsTemplate = (currentWaypointType, currentWaypoi
   </section>`;
 };
 
-const createPassageEditFormTemplate = (data) => {
-  const {currentWaypointType, currentWaypoint, price, isFavorite, offers} = data;
+const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) => {
+  const {waypointType, waypoint, price, isFavorite, offers} = data;
 
-  const headerTemplate = createPassageEditFormHeaderTemplate(currentWaypointType, currentWaypoint, price, isFavorite);
-  const detailTemplate = createPassageEditFormDetailsTemplate(currentWaypointType, currentWaypoint, offers, offersTypeSet, destinationTypeSet);
+  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite);
+  const detailTemplate = createPassageEditFormDetailsTemplate(waypointType, waypoint, offers, offersTypeSet, destinationTypeSet);
 
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
     ${headerTemplate}
@@ -178,10 +204,12 @@ const createPassageEditFormTemplate = (data) => {
 };
 
 export default class PassageEditForm extends SmartView {
-  constructor(passage) {
+  constructor(offersSet, destinationsSet, passage = BLANK_PASSAGE) {
     super();
 
     this._passage = passage;
+    this._offersSet = offersSet;
+    this._destinationsSet = destinationsSet;
     this._data = PassageEditForm.parsePassageToData(passage);
     this._startDatepicker = null;
     this._endDatepicker = null;
@@ -193,10 +221,26 @@ export default class PassageEditForm extends SmartView {
     this._waypointChangeHandler = this._waypointChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._availableOffersHandler = this._availableOffersHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setStartDatepicker();
     this._setEndDatepicker();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
   }
 
   reset(passage) {
@@ -206,7 +250,7 @@ export default class PassageEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createPassageEditFormTemplate(this._data);
+    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet);
   }
 
   _favoriteClickHandler(evt) {
@@ -224,6 +268,7 @@ export default class PassageEditForm extends SmartView {
     this._setStartDatepicker();
     this._setEndDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _setStartDatepicker() {
@@ -245,7 +290,7 @@ export default class PassageEditForm extends SmartView {
         {
           dateFormat: `d/m/y H:i`,
           enableTime: true,
-          // time_24hr: true,
+          [`time_24hr`]: true,
           defaultDate: basisDate,
           onChange: callback
         }
@@ -255,13 +300,13 @@ export default class PassageEditForm extends SmartView {
   _startDateChangeHandler([userDate]) {
     this.updateData({
       passageStartPoint: userDate
-    });
+    }, true);
   }
 
   _endDateChangeHandler([userDate]) {
     this.updateData({
       passageEndPoint: userDate
-    });
+    }, true);
   }
 
   _setInnerHandlers() {
@@ -274,6 +319,14 @@ export default class PassageEditForm extends SmartView {
     this.getElement()
     .querySelector(`.event__input--price`)
     .addEventListener(`input`, this._priceInputHandler);
+
+    if (this.getElement().querySelector(`.event__offer-checkbox`)) {
+      const availableOffers = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`));
+
+      availableOffers.forEach((item) => {
+        item.addEventListener(`change`, this._availableOffersHandler);
+      });
+    }
   }
 
   _priceInputHandler(evt) {
@@ -281,6 +334,19 @@ export default class PassageEditForm extends SmartView {
     this.updateData({
       price: evt.target.value
     }, true);
+  }
+
+  _availableOffersHandler(evt) {
+    evt.preventDefault();
+    const currentOffersSet = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox:checked`));
+    const typeOffers = this._offersSet.filter((item) => item.name.toLowerCase() === this._data.waypointType.toLowerCase())[0].offerSet;
+
+    this._data.offers = [];
+
+    currentOffersSet.forEach((element) => {
+      const currentOffer = typeOffers.filter((item) => item.title === element.name)[0];
+      this._data.offers.push(currentOffer);
+    });
   }
 
   setFavoriteClickHandler(callback) {
@@ -295,38 +361,48 @@ export default class PassageEditForm extends SmartView {
 
   _waypointTypeChangeHandler(evt) {
     evt.preventDefault();
+    this._data.offers = [];
     this.updateData({
-      currentWaypointType: evt.target.value
+      waypointType: evt.target.value
     });
   }
 
   _waypointChangeHandler(evt) {
     evt.preventDefault();
+
+    if (!routeParameters.places.some((item) => item === evt.target.value)) {
+      evt.target.value = ``;
+      evt.target.setCustomValidity(`Данный пункт назначения недоступен.`);
+    } else {
+      evt.target.setCustomValidity(``);
+    }
+
+    this.getElement().reportValidity();
+
     this.updateData({
-      currentWaypoint: evt.target.value
+      waypoint: evt.target.value
     });
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(PassageEditForm.parseDataToPassage(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   static parsePassageToData(passage) {
     return Object.assign(
         {},
-        passage,
-        {
-          currentWaypointType: passage.waypointType,
-          currentWaypoint: passage.waypoint
-        }
+        passage
     );
   }
 
   static parseDataToPassage(data) {
     data = Object.assign({}, data);
-
-    data.waypointType = data.currentWaypointType;
-    data.waypoint = data.currentWaypoint;
-
-    delete data.currentWaypointType;
-    delete data.currentWaypoint;
-
     return data;
   }
 }

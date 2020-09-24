@@ -11,6 +11,7 @@ export const SortType = {
 };
 
 export const typeTranslations = {
+  null: `Bus to`,
   taxi: `Taxi`,
   bus: `Bus`,
   train: `Train`,
@@ -21,4 +22,22 @@ export const typeTranslations = {
   checkIn: `Check-in`,
   sightseeing: `Sightseeing`,
   restaurant: `Restaurant`
+};
+
+export const UserAction = {
+  UPDATE_PASSAGE: `UPDATE_PASSAGE`,
+  ADD_PASSAGE: `ADD_PASSAGE`,
+  DELETE_PASSAGE: `DELETE_PASSAGE`
+};
+
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
+
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
 };

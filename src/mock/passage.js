@@ -6,7 +6,7 @@ const {arrivals, vehicles, places, descriptionPool, msInOneDay, maxDaysGap, maxP
 let waypointTypeCategory;
 let waypointTypeIndex;
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateWaypointType = () => {
   waypointTypeCategory = getRandomInteger(0, 1);
@@ -85,7 +85,7 @@ const generateDestinationSet = () => {
 
 const destinationSet = generateDestinationSet();
 
-export const destinationTypeSet = destinationSet.slice();
+export const destinationTypes = destinationSet.slice();
 
 export const generatePassage = () => {
   const waypointType = generateWaypointType();

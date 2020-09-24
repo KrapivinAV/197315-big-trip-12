@@ -1,5 +1,9 @@
 import moment from "moment";
 
+export const sortByDate = (passageA, passageB) => {
+  return passageA.passageStartPoint - passageB.passageStartPoint;
+};
+
 export const sortByTime = (passageA, passageB) => {
   const passageADuration = passageA.passageEndPoint - passageA.passageStartPoint;
   const passageBDuration = passageB.passageEndPoint - passageB.passageStartPoint;

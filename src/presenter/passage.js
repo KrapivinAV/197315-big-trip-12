@@ -2,6 +2,7 @@ import PassageContainerView from "../view/passage-container.js";
 import PassagePreviewView from "../view/passage-preview.js";
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {render, replace, remove} from "../utils/render.js";
+import {UserAction, UpdateType} from "../basis-constants.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -9,10 +10,12 @@ const Mode = {
 };
 
 export default class Passage {
-  constructor(dayList, changeData, changeMode) {
+  constructor(dayList, changeData, changeMode, offersSet, destinationsSet) {
     this._dayList = dayList;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._offersSet = offersSet;
+    this._destinationsSet = destinationsSet;
 
     this._passageContainerComponent = null;
     this._passagePreviewComponent = null;
@@ -23,6 +26,7 @@ export default class Passage {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(passage) {
@@ -39,11 +43,12 @@ export default class Passage {
     this._passagePreviewComponent = new PassagePreviewView(passage);
     this._passagePreviewComponent.addOffers();
 
-    this._passageEditFormComponent = new PassageEditFormView(passage);
+    this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, passage);
 
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
     this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._passageEditFormComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._passageEditFormComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (previousPassagePreviewComponent === null || previousPassageEditFormComponent === null) {
       render(this._passageContainerComponent, this._passagePreviewComponent);
@@ -99,13 +104,32 @@ export default class Passage {
     this._replacePreviewToForm();
   }
 
-  _handleFormSubmit(passage) {
-    this._changeData(passage);
+  _handleFormSubmit(update) {
+    const isMinorUpdate =
+      this._passage.passageStartPoint !== update.passageStartPoint ||
+      this._passage.passageEndPoint !== update.passageEndPoint ||
+      this._passage.price !== update.price;
+
+    this._changeData(
+        UserAction.UPDATE_PASSAGE,
+        isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+        update
+    );
     this._replaceFormToPreview();
+  }
+
+  _handleDeleteClick(passage) {
+    this._changeData(
+        UserAction.DELETE_PASSAGE,
+        UpdateType.MINOR,
+        passage
+    );
   }
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_PASSAGE,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._passage,

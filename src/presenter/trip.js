@@ -1,43 +1,67 @@
-import TripInfoContainerView from "../view/trip-info-container.js";
-import MainNavView from "../view/main-nav.js";
-import FilterView from "../view/filter.js";
 import SorterView from "../view/sorter.js";
 import DaysView from "../view/days.js";
 import DayView from "../view/day.js";
 import NoTripView from "../view/no-trip.js";
 import PassagePresenter from "./passage.js";
-import {updateItem} from "../utils/common.js";
-import {render, RenderPosition, remove} from "../utils/render.js";
-import {sortByTime, sortByPrice} from "../utils/passage.js";
-import {SortType} from "../basis-constants.js";
+import PassageNewPresenter from "./passage-new.js";
+import {render, remove} from "../utils/render.js";
+import {filter} from "../utils/filter.js";
+import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
+import {SortType, UpdateType, UserAction, FilterType} from "../basis-constants.js";
 
 export default class Trip {
-  constructor(tripMainContainer, tripPassagesContainer) {
-    this._tripMainContainer = tripMainContainer;
+  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel) {
     this._tripPassagesContainer = tripPassagesContainer;
+    this._passagesModel = passagesModel;
+    this._filterModel = filterModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._currentSortType = SortType.DEFAULT;
     this._passagePresenters = {};
 
-    this._mainNavComponent = new MainNavView();
-    this._filterComponent = new FilterView();
     this._noTripComponent = new NoTripView();
 
-    this._handlePassageChange = this._handlePassageChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._sorterComponent = null;
     this._daysComponent = null;
     this._dayComponent = null;
+
+    this._passagesModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
+    this._passageNewPresenter = null;
   }
 
-  init(currentPassages) {
-    this._sourcePassages = currentPassages.slice();
+  init() {
     this._displayPassagesGroups = new Map();
 
-    this._renderTripInfo(this._generateDisplayPassagesGroups(this._sourcePassages));
-    this._renderTripControls();
     this._render();
+  }
+
+  createPassage() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._passageNewPresenter.init();
+  }
+
+  _getPassages() {
+    const filterType = this._filterModel.getFilter();
+    const passages = this._passagesModel.getPassages();
+    const filtredPassages = filter[filterType](passages);
+
+    this._displayPassagesGroups.clear();
+    switch (this._currentSortType) {
+      case SortType.TIME_SORT:
+        return this._displayPassagesGroups.set(0, filtredPassages.sort(sortByTime));
+      case SortType.PRICE_SORT:
+        return this._displayPassagesGroups.set(0, filtredPassages.sort(sortByPrice));
+    }
+
+    return this._generateDisplayPassagesGroups(filtredPassages.sort(sortByDate));
   }
 
   _generateDisplayPassagesGroups(passages) {
@@ -60,35 +84,6 @@ export default class Trip {
     return displayPassagesGroups;
   }
 
-  _renderTripInfo(currentPassagesGroups) {
-    this._tripInfoContainerComponent = new TripInfoContainerView(currentPassagesGroups);
-    this._tripInfoContainerComponent.addParts();
-    render(this._tripMainContainer, this._tripInfoContainerComponent, RenderPosition.AFTERBEGIN);
-  }
-
-  _renderTripControls() {
-    const tripControlsElement = this._tripMainContainer.querySelector(`.trip-controls`);
-    const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
-
-    render(tripControlsFirstHeaderElement, this._mainNavComponent, RenderPosition.AFTER);
-    render(tripControlsElement, this._filterComponent);
-  }
-
-  _sortPassages(sortType) {
-    const currentPassages = this._sourcePassages.slice();
-    this._displayPassagesGroups.clear();
-    switch (sortType) {
-      case SortType.TIME_SORT:
-        this._displayPassagesGroups.set(0, currentPassages.sort(sortByTime));
-        break;
-      case SortType.PRICE_SORT:
-        this._displayPassagesGroups.set(0, currentPassages.sort(sortByPrice));
-        break;
-      default:
-        this._displayPassagesGroups = this._generateDisplayPassagesGroups(this._sourcePassages);
-    }
-  }
-
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
@@ -99,11 +94,14 @@ export default class Trip {
   }
 
   _renderSorter() {
-    if (!this._sorterComponent) {
-      this._sorterComponent = new SorterView();
-      render(this._tripPassagesContainer, this._sorterComponent);
-      this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    if (this._sorterComponent !== null) {
+      remove(this._sorterComponent);
+      this._sorterComponent = null;
     }
+
+    this._sorterComponent = new SorterView(this._currentSortType);
+    render(this._tripPassagesContainer, this._sorterComponent);
+    this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderNoTrip() {
@@ -114,6 +112,7 @@ export default class Trip {
     if (!this._daysComponent) {
       this._daysComponent = new DaysView();
       render(this._tripPassagesContainer, this._daysComponent);
+      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
     }
   }
 
@@ -134,24 +133,48 @@ export default class Trip {
 
   _renderPassage(item) {
     const dayList = this._dayComponent.getElement().querySelector(`.trip-events__list`);
-    const passagePresenter = new PassagePresenter(dayList, this._handlePassageChange, this._handleModeChange);
+    const passagePresenter = new PassagePresenter(dayList, this._handleViewAction, this._handleModeChange, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
     passagePresenter.init(item);
     this._passagePresenters[item.id] = passagePresenter;
   }
 
   _handleModeChange() {
+    this._passageNewPresenter.destroy();
     Object
       .values(this._passagePresenters)
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handlePassageChange(updatedPassage) {
-    this._sourcePassages = updateItem(this._sourcePassages, updatedPassage);
-    this._passagePresenters[updatedPassage.id].init(updatedPassage);
+  _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_PASSAGE:
+        this._passagesModel.updatePassage(updateType, update);
+        break;
+      case UserAction.ADD_PASSAGE:
+        this._passagesModel.addPassage(updateType, update);
+        break;
+      case UserAction.DELETE_PASSAGE:
+        this._passagesModel.deletePassage(updateType, update);
+        break;
+    }
   }
 
-  _renderTripList(currentPassagesGroups) {
-    if (!this._sourcePassages.length) {
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._passagePresenters[data.id].init(data);
+        break;
+      case UpdateType.MINOR:
+        this._render();
+        break;
+      case UpdateType.MAJOR:
+        this._render(true);
+        break;
+    }
+  }
+
+  _renderTripList() {
+    if (!this._passagesModel.getPassages().length) {
       remove(this._sorterComponent);
       this._sorterComponent = null;
       remove(this._daysComponent);
@@ -162,10 +185,14 @@ export default class Trip {
 
     this._renderSorter();
     this._renderDaysConteiner();
-    this._renderDays(currentPassagesGroups);
+    this._renderDays(this._getPassages());
   }
 
-  _clearTripList() {
+  _clearTripList(resetSortType) {
+    if (this._passageNewPresenter) {
+      this._passageNewPresenter.destroy();
+    }
+
     Object
       .values(this._passagePresenters)
       .forEach((presenter) => presenter.destroy());
@@ -173,13 +200,18 @@ export default class Trip {
 
     if (this._daysComponent) {
       Array.from(this._daysComponent.getElement().querySelectorAll(`.trip-days__item`)).forEach((item) => item.remove());
+      remove(this._daysComponent);
+      this._daysComponent = null;
+    }
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
     }
   }
 
-  _render() {
-    this._sortPassages(this._currentSortType);
-    this._clearTripList();
-    this._renderTripList(this._displayPassagesGroups);
+  _render(resetSortType = false) {
+    this._clearTripList(resetSortType);
+    this._renderTripList();
   }
 }
 
