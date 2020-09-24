@@ -260,7 +260,9 @@ export default class PassageEditForm extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data));
+    if (this.getElement().checkValidity()) {
+      this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data));
+    }
   }
 
   restoreHandlers() {
@@ -369,15 +371,15 @@ export default class PassageEditForm extends SmartView {
 
   _waypointChangeHandler(evt) {
     evt.preventDefault();
+    const isExist = routeParameters.places.some((item) => item === evt.target.value);
+    const massage = !isExist ? `Данный пункт назначения недоступен.` : ``;
 
-    if (!routeParameters.places.some((item) => item === evt.target.value)) {
-      evt.target.value = ``;
-      evt.target.setCustomValidity(`Данный пункт назначения недоступен.`);
-    } else {
-      evt.target.setCustomValidity(``);
-    }
-
+    evt.target.setCustomValidity(massage);
     this.getElement().reportValidity();
+
+    if (!isExist) {
+      return;
+    }
 
     this.updateData({
       waypoint: evt.target.value
