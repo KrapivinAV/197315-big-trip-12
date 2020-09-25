@@ -10,12 +10,13 @@ import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
 import {SortType, UpdateType, UserAction, FilterType} from "../basis-constants.js";
 
 export default class Trip {
-  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel) {
+  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode) {
     this._tripPassagesContainer = tripPassagesContainer;
     this._passagesModel = passagesModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
+    this._deactiveteCreatePassageMode = deactiveteCreatePassageMode;
     this._currentSortType = SortType.DEFAULT;
     this._passagePresenters = {};
 
@@ -112,7 +113,7 @@ export default class Trip {
     if (!this._daysComponent) {
       this._daysComponent = new DaysView();
       render(this._tripPassagesContainer, this._daysComponent);
-      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
+      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations(), this._deactiveteCreatePassageMode);
     }
   }
 

@@ -10,8 +10,24 @@ import PassagesModel from "./model/passages.js";
 import OffersModel from "./model/offers.js";
 import DestinationsModel from "./model/destinations.js";
 import FilterModel from "./model/filter.js";
+import {MenuItem} from "./basis-constants.js";
+
 
 const PASSAGE_COUNT = 20;
+
+const addPassageButtonElement = document.querySelector(`.trip-main__event-add-btn`);
+
+const activateCreatePassageMode = (evt) => {
+  evt.preventDefault();
+  addPassageButtonElement.removeEventListener(`click`, activateCreatePassageMode);
+  addPassageButtonElement.disabled = true;
+  trip.createPassage();
+};
+
+const deactiveteCreatePassageMode = () => {
+  addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
+  addPassageButtonElement.disabled = false;
+};
 
 const passages = new Array(PASSAGE_COUNT).fill().map(generatePassage);
 
@@ -24,8 +40,9 @@ const tripMainElement = document.querySelector(`.trip-main`);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
+const mainNavComponent = new MainNavView();
 
-render(tripControlsFirstHeaderElement, new MainNavView(), RenderPosition.AFTER);
+render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
 
 const passagesModel = new PassagesModel();
 passagesModel.setPassages(passages);
@@ -41,12 +58,24 @@ const filterModel = new FilterModel();
 const tripPassagesElement = document.querySelector(`.trip-events`);
 
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel, passagesModel);
-const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, destinationsModel, filterModel);
+const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode);
+
+const handleMainNavClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      // Показать доску
+      // Скрыть статистику
+      break;
+    case MenuItem.STATS:
+      // Скрыть доску
+      // Показать статистику
+      break;
+  }
+};
+
+mainNavComponent.setMainNavClickHandler(handleMainNavClick);
 
 filterPresenter.init();
 trip.init();
 
-document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
-  evt.preventDefault();
-  trip.createPassage();
-});
+addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);

@@ -46,3 +46,8 @@ export const FormType = {
   CREATE_PASSAGE: `CREATE_PASSAGE`,
   EDIT_PASSAGE: `EDIT_PASSAGE`
 };
+
+export const MenuItem = {
+  TABLE: `TABLE`,
+  STATS: `STATS`
+};

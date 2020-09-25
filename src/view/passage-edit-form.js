@@ -254,10 +254,6 @@ export default class PassageEditForm extends SmartView {
     return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet, this._formType);
   }
 
-  // setNewPassageButtonDisabled() {
-  //   this.getElement().querySelector(``)
-  // }
-
   _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoriteClick();
@@ -310,15 +306,21 @@ export default class PassageEditForm extends SmartView {
   }
 
   _startDateChangeHandler([userDate]) {
+    const isValid = this._data.passageEndPoint > userDate;
+    this._data.passageEndPoint = isValid ? this._data.passageEndPoint : userDate;
+
     this.updateData({
       passageStartPoint: userDate
-    }, true);
+    });
   }
 
   _endDateChangeHandler([userDate]) {
+    const isValid = this._data.passageStartPoint < userDate;
+    this._data.passageStartPoint = isValid ? this._data.passageStartPoint : userDate;
+
     this.updateData({
       passageEndPoint: userDate
-    }, true);
+    });
   }
 
   _setInnerHandlers() {
