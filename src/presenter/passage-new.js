@@ -1,14 +1,15 @@
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {generateId} from "../mock/passage.js";
 import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType} from "../basis-constants";
+import {UserAction, UpdateType, FormType} from "../basis-constants.js";
 
 export default class PassageNew {
-  constructor(tripPassagesContainer, changeData, offersSet, destinationsSet) {
+  constructor(tripPassagesContainer, changeData, offersSet, destinationsSet, deactiveteCreatePassageMode) {
     this._tripPassagesContainer = tripPassagesContainer;
     this._changeData = changeData;
     this._offersSet = offersSet;
     this._destinationsSet = destinationsSet;
+    this._deactiveteCreatePassageMode = deactiveteCreatePassageMode;
 
     this._passageEditFormComponent = null;
 
@@ -22,9 +23,10 @@ export default class PassageNew {
       return;
     }
 
-    this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet);
+    this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, FormType.CREATE_PASSAGE);
     this._passageEditFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._passageEditFormComponent.setDeleteClickHandler(this._handleCancelClick);
+    // this._passageEditFormComponent.setNewPassageButtonDisabled();
 
     render(this._tripPassagesContainer, this._passageEditFormComponent, RenderPosition.AFTERBEGIN);
 
@@ -39,6 +41,7 @@ export default class PassageNew {
     remove(this._passageEditFormComponent);
     this._passageEditFormComponent = null;
 
+    this._deactiveteCreatePassageMode();
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 

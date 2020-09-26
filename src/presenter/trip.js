@@ -7,15 +7,16 @@ import PassageNewPresenter from "./passage-new.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
-import {SortType, UpdateType, UserAction, FilterType} from "../basis-constants.js";
+import {SortType, UpdateType, UserAction} from "../basis-constants.js";
 
 export default class Trip {
-  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel) {
+  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode) {
     this._tripPassagesContainer = tripPassagesContainer;
     this._passagesModel = passagesModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
+    this._deactiveteCreatePassageMode = deactiveteCreatePassageMode;
     this._currentSortType = SortType.DEFAULT;
     this._passagePresenters = {};
 
@@ -30,21 +31,28 @@ export default class Trip {
     this._daysComponent = null;
     this._dayComponent = null;
 
-    this._passagesModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-
     this._passageNewPresenter = null;
   }
 
   init() {
     this._displayPassagesGroups = new Map();
 
+    this._passagesModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._render();
   }
 
+  destroy() {
+    this._clearTripList(true);
+
+    remove(this._sorterComponent);
+
+    this._passagesModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
   createPassage() {
-    this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._passageNewPresenter.init();
   }
 
@@ -112,7 +120,7 @@ export default class Trip {
     if (!this._daysComponent) {
       this._daysComponent = new DaysView();
       render(this._tripPassagesContainer, this._daysComponent);
-      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
+      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations(), this._deactiveteCreatePassageMode);
     }
   }
 

@@ -19,7 +19,7 @@ const BLANK_PASSAGE = {
 
 const {arrivals} = basisConstants;
 
-const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite) => {
+const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite, formType) => {
   let routePlaceholderPart = ``;
   let checkedStatus = ``;
   let typeMark = null;
@@ -130,9 +130,9 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
     </div>
 
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">${waypointType !== `` ? `Delete` : `Cancel`}</button>
+    <button class="event__reset-btn" type="reset">${formType === `EDIT_PASSAGE` ? `Delete` : `Cancel`}</button>
 
-    ${waypointType !== `` ?
+    ${formType === `EDIT_PASSAGE` ?
     `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${checkedStatus}>
     <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -191,10 +191,10 @@ const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, of
   </section>`;
 };
 
-const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) => {
+const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet, formType) => {
   const {waypointType, waypoint, price, isFavorite, offers} = data;
 
-  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite);
+  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite, formType);
   const detailTemplate = createPassageEditFormDetailsTemplate(waypointType, waypoint, offers, offersTypeSet, destinationTypeSet);
 
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -204,12 +204,13 @@ const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet) 
 };
 
 export default class PassageEditForm extends SmartView {
-  constructor(offersSet, destinationsSet, passage = BLANK_PASSAGE) {
+  constructor(offersSet, destinationsSet, formType, passage = BLANK_PASSAGE) {
     super();
 
     this._passage = passage;
     this._offersSet = offersSet;
     this._destinationsSet = destinationsSet;
+    this._formType = formType;
     this._data = PassageEditForm.parsePassageToData(passage);
     this._startDatepicker = null;
     this._endDatepicker = null;
@@ -250,7 +251,7 @@ export default class PassageEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet);
+    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet, this._formType);
   }
 
   _favoriteClickHandler(evt) {
@@ -260,7 +261,14 @@ export default class PassageEditForm extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data));
+
+    if (this._data.waypointType === ``) {
+      this._data.waypointType = `bus`;
+    }
+
+    if (this.getElement().checkValidity()) {
+      this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data));
+    }
   }
 
   restoreHandlers() {
@@ -298,15 +306,21 @@ export default class PassageEditForm extends SmartView {
   }
 
   _startDateChangeHandler([userDate]) {
+    const isValid = this._data.passageEndPoint > userDate;
+    this._data.passageEndPoint = isValid ? this._data.passageEndPoint : userDate;
+
     this.updateData({
       passageStartPoint: userDate
-    }, true);
+    });
   }
 
   _endDateChangeHandler([userDate]) {
+    const isValid = this._data.passageStartPoint < userDate;
+    this._data.passageStartPoint = isValid ? this._data.passageStartPoint : userDate;
+
     this.updateData({
       passageEndPoint: userDate
-    }, true);
+    });
   }
 
   _setInnerHandlers() {
@@ -318,7 +332,7 @@ export default class PassageEditForm extends SmartView {
     .addEventListener(`change`, this._waypointChangeHandler);
     this.getElement()
     .querySelector(`.event__input--price`)
-    .addEventListener(`input`, this._priceInputHandler);
+    .addEventListener(`change`, this._priceInputHandler);
 
     if (this.getElement().querySelector(`.event__offer-checkbox`)) {
       const availableOffers = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`));
@@ -331,6 +345,17 @@ export default class PassageEditForm extends SmartView {
 
   _priceInputHandler(evt) {
     evt.preventDefault();
+
+    const isValid = +evt.target.value === parseInt(evt.target.value, 10) && +evt.target.value >= 0;
+    const massage = !isValid ? `Введите целое положительное число.` : ``;
+
+    evt.target.setCustomValidity(massage);
+    this.getElement().reportValidity();
+
+    if (!isValid) {
+      return;
+    }
+
     this.updateData({
       price: evt.target.value
     }, true);
@@ -369,15 +394,15 @@ export default class PassageEditForm extends SmartView {
 
   _waypointChangeHandler(evt) {
     evt.preventDefault();
+    const isExist = routeParameters.places.some((item) => item === evt.target.value);
+    const massage = !isExist ? `Данный пункт назначения недоступен.` : ``;
 
-    if (!routeParameters.places.some((item) => item === evt.target.value)) {
-      evt.target.value = ``;
-      evt.target.setCustomValidity(`Данный пункт назначения недоступен.`);
-    } else {
-      evt.target.setCustomValidity(``);
-    }
-
+    evt.target.setCustomValidity(massage);
     this.getElement().reportValidity();
+
+    if (!isExist) {
+      return;
+    }
 
     this.updateData({
       waypoint: evt.target.value
