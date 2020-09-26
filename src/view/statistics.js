@@ -1,7 +1,7 @@
 import AbstractView from "./abstract.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {basisConstants} from "../basis-constants.js";
+import {basisConstants, typeIcons} from "../basis-constants.js";
 import {generateMoneyByTypes, generateQuantityByTypes, generateSpendTimeByTypes} from '../utils/statistics.js';
 
 const BAR_HEIGHT = 55;
@@ -40,6 +40,7 @@ const renderMoneyByTypes = (moneyCtx, data) => {
         display: true,
         text: `MONEY`,
         fontColor: `#000000`,
+        padding: 35,
         fontSize: 23,
         position: `left`
       },
@@ -49,6 +50,9 @@ const renderMoneyByTypes = (moneyCtx, data) => {
             fontColor: `#000000`,
             padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${typeIcons[type.toLowerCase()]} ${type.toUpperCase()}`;
+            }
           },
           gridLines: {
             display: false,
@@ -107,6 +111,7 @@ const renderQuantityByTypes = (quantityCtx, data) => {
         display: true,
         text: `TRANSPORT`,
         fontColor: `#000000`,
+        padding: 35,
         fontSize: 23,
         position: `left`
       },
@@ -114,8 +119,11 @@ const renderQuantityByTypes = (quantityCtx, data) => {
         yAxes: [{
           ticks: {
             fontColor: `#000000`,
-            padding: 15,
+            padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${typeIcons[type.toLowerCase()]} ${type.toUpperCase()}`;
+            },
           },
           gridLines: {
             display: false,
@@ -174,6 +182,7 @@ const renderSpendTimeByTypes = (spendTimeCtx, data) => {
         display: true,
         text: `SPEND TIME`,
         fontColor: `#000000`,
+        padding: 35,
         fontSize: 23,
         position: `left`
       },
@@ -183,6 +192,9 @@ const renderSpendTimeByTypes = (spendTimeCtx, data) => {
             fontColor: `#000000`,
             padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${typeIcons[type.toLowerCase()]} ${type.toUpperCase()}`;
+            },
           },
           gridLines: {
             display: false,

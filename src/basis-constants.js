@@ -51,3 +51,16 @@ export const MenuItem = {
   TABLE: `TABLE`,
   STATS: `STATS`
 };
+
+export const typeIcons = {
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🛳`,
+  'transport': `🚊`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛`,
+  'restaurant': `🍴`
+};

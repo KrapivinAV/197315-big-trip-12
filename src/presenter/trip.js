@@ -19,6 +19,7 @@ export default class Trip {
     this._deactiveteCreatePassageMode = deactiveteCreatePassageMode;
     this._currentSortType = SortType.DEFAULT;
     this._passagePresenters = {};
+    this._dayComponents = [];
 
     this._noTripComponent = new NoTripView();
 
@@ -58,7 +59,7 @@ export default class Trip {
 
   _getPassages() {
     const filterType = this._filterModel.getFilter();
-    const passages = this._passagesModel.getPassages();
+    const passages = this._passagesModel.getPassages().slice();
     const filtredPassages = filter[filterType](passages);
 
     this._displayPassagesGroups.clear();
@@ -76,10 +77,10 @@ export default class Trip {
     const displayPassagesGroups = new Map();
 
     passages.forEach((passage) => {
-      const dayStart = passage.passageStartPoint.setHours(0, 0, 0, 0);
+      const dayStart = new Date(passage.passageStartPoint).setHours(0, 0, 0, 0);
 
       if (!displayPassagesGroups.has(dayStart)) {
-        const dayEnd = passage.passageStartPoint.setHours(23, 59, 59, 999);
+        const dayEnd = new Date(passage.passageStartPoint).setHours(23, 59, 59, 999);
 
         const daySet = passages.filter((item) => {
           const passageStartTime = item.passageStartPoint.getTime();
@@ -130,6 +131,8 @@ export default class Trip {
 
       this._dayComponent = new DayView(dayKey, index + 1);
       this._addPassages(items);
+
+      this._dayComponents.push(this._dayComponent);
 
       render(this._daysComponent, this._dayComponent);
     });
@@ -207,7 +210,13 @@ export default class Trip {
     this._passagePresenters = {};
 
     if (this._daysComponent) {
-      Array.from(this._daysComponent.getElement().querySelectorAll(`.trip-days__item`)).forEach((item) => item.remove());
+      this._dayComponents.forEach((item) => {
+        remove(item);
+        item = null;
+      });
+
+      this._dayComponents = [];
+
       remove(this._daysComponent);
       this._daysComponent = null;
     }
