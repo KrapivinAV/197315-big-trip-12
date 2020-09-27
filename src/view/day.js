@@ -1,9 +1,11 @@
 import AbstractView from "./abstract.js";
 import {formatDate} from "../utils/passage.js";
+import {SORTER_MODE} from "../basis-constants.js";
+
 
 const createDayTemplate = (dayKey, index) => {
 
-  return dayKey + index !== 1 ?
+  return dayKey + index !== SORTER_MODE ?
     `<li class="trip-days__item  day">
       <div class="day__info">
         <span class="day__counter">${index}</span>

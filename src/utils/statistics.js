@@ -1,4 +1,4 @@
-import {formatDate} from "./passage.js";
+import moment from "moment";
 
 export const generateMoneyByTypes = (passages, arrivals, vehicles) => {
   const types = arrivals.concat(vehicles);
@@ -10,7 +10,7 @@ export const generateMoneyByTypes = (passages, arrivals, vehicles) => {
     const currentTypePassages = passages.filter((passage) => passage.waypointType.toLowerCase() === item.toLowerCase());
 
     if (currentTypePassages.length !== 0) {
-      selectedTypes.push(item.toUpperCase());
+      selectedTypes.push(item);
       summaryPrices.push(currentTypePassages.map((passage) => passage.price).reduce((accumulator, currentValue) => accumulator + currentValue));
     }
   });
@@ -29,7 +29,7 @@ export const generateQuantityByTypes = (passages, vehicles) => {
     const currentTypePassages = passages.filter((passage) => passage.waypointType.toLowerCase() === item.toLowerCase());
 
     if (currentTypePassages.length !== 0) {
-      selectedTypes.push(item.toUpperCase());
+      selectedTypes.push(item);
       quantity.push(currentTypePassages.length);
     }
   });
@@ -50,8 +50,8 @@ export const generateSpendTimeByTypes = (passages, arrivals, vehicles) => {
     const currentTypePassages = passages.filter((passage) => passage.waypointType.toLowerCase() === item.toLowerCase());
 
     if (currentTypePassages.length !== 0) {
-      selectedTypes.push(item.toUpperCase());
-      summaryTimes.push(formatDate(new Date(currentTypePassages.map((passage) => passage.passageEndPoint - passage.passageStartPoint).reduce((accumulator, currentValue) => accumulator + currentValue)), `DD`));
+      selectedTypes.push(item);
+      summaryTimes.push(formatSpendTime(new Date(currentTypePassages.map((passage) => passage.passageEndPoint - passage.passageStartPoint).reduce((accumulator, currentValue) => accumulator + currentValue))));
     }
   });
 
@@ -59,4 +59,8 @@ export const generateSpendTimeByTypes = (passages, arrivals, vehicles) => {
     labels: selectedTypes,
     values: summaryTimes
   };
+};
+
+export const formatSpendTime = (duration) => {
+  return moment.duration(duration).days();
 };

@@ -13,4 +13,22 @@ export default class Offers extends Observer {
   getOffers() {
     return this._offers;
   }
+
+  static adaptToClient(offer) {
+    const adaptedOffer = Object.assign(
+        {},
+        offer,
+        {
+          name: offer.type,
+          offerSet: offer.offers
+        }
+    );
+
+    delete adaptedOffer.type;
+    delete adaptedOffer.offers;
+
+    return adaptedOffer;
+  }
 }
+
+

@@ -2,12 +2,7 @@ import PassageContainerView from "../view/passage-container.js";
 import PassagePreviewView from "../view/passage-preview.js";
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {render, replace, remove} from "../utils/render.js";
-import {UserAction, UpdateType, FormType} from "../basis-constants.js";
-
-const Mode = {
-  DEFAULT: `DEFAULT`,
-  EDITING: `EDITING`
-};
+import {UserAction, UpdateType, FormType, Mode, State, EvtKey} from "../basis-constants.js";
 
 export default class Passage {
   constructor(dayList, changeData, changeMode, offersSet, destinationsSet) {
@@ -40,10 +35,10 @@ export default class Passage {
     const previousPassagePreviewComponent = this._passagePreviewComponent;
     const previousPassageEditFormComponent = this._passageEditFormComponent;
 
-    this._passagePreviewComponent = new PassagePreviewView(passage);
+    this._passagePreviewComponent = new PassagePreviewView(this._passage);
     this._passagePreviewComponent.addOffers();
 
-    this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, FormType.EDIT_PASSAGE, passage);
+    this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, FormType.EDIT_PASSAGE, this._passage);
 
     this._passagePreviewComponent.setRollUpClickHandler(this._handleRollUpClick);
     this._passageEditFormComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -60,7 +55,8 @@ export default class Passage {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._passageEditFormComponent, previousPassageEditFormComponent);
+      replace(this._passagePreviewComponent, previousPassageEditFormComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(previousPassagePreviewComponent);
@@ -79,6 +75,35 @@ export default class Passage {
     }
   }
 
+  setViewState(state) {
+    const resetFormState = () => {
+      this._taskEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._passageEditFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._passageEditFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+      case State.ABORTING:
+        this._passagePreviewComponent.shake(resetFormState);
+        this._passageEditFormComponent.shake(resetFormState);
+        break;
+    }
+  }
+
   _replacePreviewToForm() {
     replace(this._passageEditFormComponent, this._passagePreviewComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
@@ -93,7 +118,7 @@ export default class Passage {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === EvtKey.ESCAPE || evt.key === EvtKey.ESC) {
       evt.preventDefault();
       this._passageEditFormComponent.reset(this._passage);
       this._replaceFormToPreview();
@@ -115,7 +140,6 @@ export default class Passage {
         isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
         update
     );
-    this._replaceFormToPreview();
   }
 
   _handleDeleteClick(passage) {
@@ -127,6 +151,8 @@ export default class Passage {
   }
 
   _handleFavoriteClick() {
+    const destination = this._destinationsSet.filter((item) => item.name === this._passage.waypoint)[0];
+
     this._changeData(
         UserAction.UPDATE_PASSAGE,
         UpdateType.PATCH,
@@ -135,6 +161,9 @@ export default class Passage {
             this._passage,
             {
               isFavorite: !this._passage.isFavorite
+            },
+            {
+              destination
             }
         )
     );

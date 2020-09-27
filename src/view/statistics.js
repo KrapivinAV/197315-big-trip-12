@@ -1,16 +1,13 @@
 import AbstractView from "./abstract.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {basisConstants} from "../basis-constants.js";
+import {basisConstants, typeIcons, BAR_HEIGHT} from "../basis-constants.js";
 import {generateMoneyByTypes, generateQuantityByTypes, generateSpendTimeByTypes} from '../utils/statistics.js';
-
-const BAR_HEIGHT = 55;
 
 const {arrivals, vehicles} = basisConstants;
 
-const renderMoneyByTypes = (moneyCtx, data) => {
-
-  return new Chart(moneyCtx, {
+const renderChart = (ctx, data, formatterStartString, formatterEndString) => {
+  return new Chart(ctx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
@@ -33,13 +30,14 @@ const renderMoneyByTypes = (moneyCtx, data) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `€ ${val}`
+          formatter: (val) => `${formatterStartString}${val}${formatterEndString}`
         }
       },
       title: {
         display: true,
         text: `MONEY`,
         fontColor: `#000000`,
+        padding: 35,
         fontSize: 23,
         position: `left`
       },
@@ -49,6 +47,9 @@ const renderMoneyByTypes = (moneyCtx, data) => {
             fontColor: `#000000`,
             padding: 5,
             fontSize: 13,
+            callback: (type) => {
+              return `${typeIcons[type.toLowerCase()]} ${type.toUpperCase()}`;
+            }
           },
           gridLines: {
             display: false,
@@ -74,140 +75,27 @@ const renderMoneyByTypes = (moneyCtx, data) => {
       }
     }
   });
+};
+
+const renderMoneyByTypes = (moneyCtx, data) => {
+  const formatterStartString = `€ `;
+  const formatterEndString = ``;
+
+  renderChart(moneyCtx, data, formatterStartString, formatterEndString);
 };
 
 const renderQuantityByTypes = (quantityCtx, data) => {
-  return new Chart(quantityCtx, {
-    plugins: [ChartDataLabels],
-    type: `horizontalBar`,
-    data: {
-      labels: data.labels,
-      datasets: [{
-        data: data.values,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`,
-        minBarLength: 50,
-        barThickness: 44
-      }]
-    },
-    options: {
-      plugins: {
-        datalabels: {
-          font: {
-            size: 13
-          },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
-          formatter: (val) => `${val}x`
-        }
-      },
-      title: {
-        display: true,
-        text: `TRANSPORT`,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            fontColor: `#000000`,
-            padding: 15,
-            fontSize: 13,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-        }],
-        xAxes: [{
-          ticks: {
-            display: false,
-            beginAtZero: true,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-        }],
-      },
-      legend: {
-        display: false
-      },
-      tooltips: {
-        enabled: false,
-      }
-    }
-  });
+  const formatterStartString = ``;
+  const formatterEndString = `x`;
+
+  renderChart(quantityCtx, data, formatterStartString, formatterEndString);
 };
 
 const renderSpendTimeByTypes = (spendTimeCtx, data) => {
-  return new Chart(spendTimeCtx, {
-    plugins: [ChartDataLabels],
-    type: `horizontalBar`,
-    data: {
-      labels: data.labels,
-      datasets: [{
-        data: data.values,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`,
-        minBarLength: 50,
-        barThickness: 44
-      }]
-    },
-    options: {
-      plugins: {
-        datalabels: {
-          font: {
-            size: 13
-          },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
-          formatter: (val) => `D ${val}`
-        }
-      },
-      title: {
-        display: true,
-        text: `SPEND TIME`,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-        }],
-        xAxes: [{
-          ticks: {
-            display: false,
-            beginAtZero: true,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-        }],
-      },
-      legend: {
-        display: false
-      },
-      tooltips: {
-        enabled: false,
-      }
-    }
-  });
+  const formatterStartString = `D `;
+  const formatterEndString = ``;
+
+  renderChart(spendTimeCtx, data, formatterStartString, formatterEndString);
 };
 
 const createStatisticsTemplate = () => {

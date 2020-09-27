@@ -1,7 +1,11 @@
 export const basisConstants = {
   arrivals: [`Check-in`, `Sightseeing`, `Restaurant`],
   vehicles: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
-  descriptionText: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`
+};
+
+export const EvtKey = {
+  ESCAPE: `Escape`,
+  ESC: `Esc`,
 };
 
 export const SortType = {
@@ -33,7 +37,8 @@ export const UserAction = {
 export const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 export const FilterType = {
@@ -51,3 +56,65 @@ export const MenuItem = {
   TABLE: `TABLE`,
   STATS: `STATS`
 };
+
+export const typeIcons = {
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🛳`,
+  'transport': `🚊`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛`,
+  'restaurant': `🍴`
+};
+
+export const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
+
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+  BEFORE: `before`,
+  AFTER: `after`
+};
+
+export const BLANK_PASSAGE = {
+  isFavorite: false,
+  offers: [],
+  passageEndPoint: new Date(),
+  passageStartPoint: new Date(),
+  price: ``,
+  waypoint: ``,
+  waypointType: ``
+};
+
+export const Method = {
+  GET: `GET`,
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
+};
+
+export const SuccessHTTPStatusRange = {
+  MIN: 200,
+  MAX: 299
+};
+
+export const BLANK_DAY = 0;
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+export const SORTER_MODE = 1;
+export const FILTER_DISABLE_VALUE = 0;
+export const FIRST_ITEM = 0;
+export const MIN_PRICE = 0;
+export const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
+export const BAR_HEIGHT = 55;

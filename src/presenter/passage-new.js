@@ -1,7 +1,6 @@
 import PassageEditFormView from "../view/passage-edit-form.js";
-import {generateId} from "../mock/passage.js";
-import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType, FormType} from "../basis-constants.js";
+import {remove, render} from "../utils/render.js";
+import {UserAction, UpdateType, FormType, EvtKey, RenderPosition} from "../basis-constants.js";
 
 export default class PassageNew {
   constructor(tripPassagesContainer, changeData, offersSet, destinationsSet, deactiveteCreatePassageMode) {
@@ -26,7 +25,6 @@ export default class PassageNew {
     this._passageEditFormComponent = new PassageEditFormView(this._offersSet, this._destinationsSet, FormType.CREATE_PASSAGE);
     this._passageEditFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._passageEditFormComponent.setDeleteClickHandler(this._handleCancelClick);
-    // this._passageEditFormComponent.setNewPassageButtonDisabled();
 
     render(this._tripPassagesContainer, this._passageEditFormComponent, RenderPosition.AFTERBEGIN);
 
@@ -45,13 +43,31 @@ export default class PassageNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._passageEditFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._passageEditFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._passageEditFormComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(passage) {
     this._changeData(
         UserAction.ADD_PASSAGE,
         UpdateType.MINOR,
-        Object.assign({id: generateId()}, passage)
+        passage
     );
-    this.destroy();
   }
 
   _handleCancelClick() {
@@ -59,7 +75,7 @@ export default class PassageNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === EvtKey.ESCAPE || evt.key === EvtKey.ESC) {
       evt.preventDefault();
       this.destroy();
     }

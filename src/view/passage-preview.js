@@ -1,16 +1,14 @@
-import {basisConstants, typeTranslations} from "../basis-constants.js";
-import {formatDate} from "../utils/passage.js";
-import PassagePreviewOfferView from "./passage-preview-offer.js";
+import {basisConstants, typeTranslations, MAX_QUANTITY_OF_OFFERS_IN_PREVIEW} from "../basis-constants.js";
+import {formatDate, formatPassageDuration} from "../utils/passage.js";
 import {render} from "../utils/render.js";
+import PassagePreviewOfferView from "./passage-preview-offer.js";
 import AbstractView from "./abstract.js";
 
 import he from "he";
 
-const {arrivals} = basisConstants;
-const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
-
 const createPassagePreviewTemplate = (passage) => {
   const {waypointType, waypoint, passageStartPoint, passageEndPoint, price} = passage;
+  const {arrivals} = basisConstants;
   const typeMark = waypointType.toLowerCase() === `check-in` ? `checkIn` : waypointType.toLowerCase();
   const routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
 
@@ -26,7 +24,7 @@ const createPassagePreviewTemplate = (passage) => {
         &mdash;
         <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${formatDate(passageEndPoint, `hh:mm`)}</time>
       </p>
-      <p class="event__duration">${formatDate(new Date(passageEndPoint - passageStartPoint), `DD[D] hh[H] mm[M]`)}</p>
+      <p class="event__duration">${formatPassageDuration(new Date(passageEndPoint - passageStartPoint))}</p>
     </div>
 
     <p class="event__price">

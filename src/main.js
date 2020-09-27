@@ -1,8 +1,4 @@
-import {generatePassage} from "./mock/passage.js";
-import {offersTypeSet} from "./mock/offers.js";
-import {destinationTypeSet} from "./mock/destinations.js";
-import {remove, render, RenderPosition} from "./utils/render.js";
-// import TripInfoContainerView from "./view/trip-info-container.js";
+import {remove, render} from "./utils/render.js";
 import MainNavView from "./view/main-nav.js";
 import StatisticsView from "./view/statistics.js";
 import TripPresenter from "./presenter/trip.js";
@@ -11,60 +7,45 @@ import PassagesModel from "./model/passages.js";
 import OffersModel from "./model/offers.js";
 import DestinationsModel from "./model/destinations.js";
 import FilterModel from "./model/filter.js";
-import {MenuItem, UpdateType, FilterType} from "./basis-constants.js";
+import {MenuItem, UpdateType, FilterType, RenderPosition} from "./basis-constants.js";
+import Api from "./api.js";
 
-const PASSAGE_COUNT = 20;
+const AUTHORIZATION = `Basic h47d7dh42ka06kv`;
+const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const pageBodyContainer = document.querySelector(`.page-main .page-body__container`);
 const addPassageButtonElement = document.querySelector(`.trip-main__event-add-btn`);
+const tripMainElement = document.querySelector(`.trip-main`);
+const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
+const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
+const tripPassagesElement = document.querySelector(`.trip-events`);
 
-const activateCreatePassageMode = (evt) => {
+const api = new Api(END_POINT, AUTHORIZATION);
+const mainNavComponent = new MainNavView();
+const passagesModel = new PassagesModel();
+const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
+const filterModel = new FilterModel();
+
+const handleAddPassageClick = (evt) => {
   evt.preventDefault();
   remove(statisticsComponent);
   trip.destroy();
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   trip.init();
   mainNavComponent.resetMainNavStatus();
-  addPassageButtonElement.removeEventListener(`click`, activateCreatePassageMode);
+  addPassageButtonElement.removeEventListener(`click`, handleAddPassageClick);
   addPassageButtonElement.disabled = true;
   trip.createPassage();
 };
 
-const deactiveteCreatePassageMode = () => {
-  addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
+const handleAddPassageClose = () => {
+  addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
   addPassageButtonElement.disabled = false;
 };
 
-const passages = new Array(PASSAGE_COUNT).fill().map(generatePassage);
-
-const tripMainElement = document.querySelector(`.trip-main`);
-
-// const tripInfoContainerElement = new TripInfoContainerView(passages);
-// tripInfoContainerElement.addParts();
-
-// render(tripMainElement, tripInfoContainerElement, RenderPosition.AFTERBEGIN);
-
-const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
-const tripControlsFirstHeaderElement = tripControlsElement.querySelector(`.trip-controls h2`); // найдет первый
-const mainNavComponent = new MainNavView();
-
-render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
-
-const passagesModel = new PassagesModel();
-passagesModel.setPassages(passages);
-
-const offersModel = new OffersModel();
-offersModel.setOffers(offersTypeSet);
-
-const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(destinationTypeSet);
-
-const filterModel = new FilterModel();
-
-const tripPassagesElement = document.querySelector(`.trip-events`);
-
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel, passagesModel);
-const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode);
+const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, destinationsModel, filterModel, handleAddPassageClose, api);
 
 let statisticsComponent = null;
 
@@ -82,9 +63,27 @@ const handleMainNavClick = (menuItem) => {
   }
 };
 
-mainNavComponent.setMainNavClickHandler(handleMainNavClick);
-
 filterPresenter.init();
 trip.init();
 
-addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
+Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
+  .then(([points, offers, destinations]) => {
+    offersModel.setOffers(offers);
+    destinationsModel.setDestinations(destinations);
+    passagesModel.setPassages(UpdateType.INIT, points);
+
+    render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
+
+    mainNavComponent.setMainNavClickHandler(handleMainNavClick);
+    addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
+  })
+  .catch(() => {
+    offersModel.setOffers([]);
+    destinationsModel.setDestinations([]);
+    passagesModel.setPassages(UpdateType.INIT, []);
+
+    render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
+
+    mainNavComponent.setMainNavClickHandler(handleMainNavClick);
+    addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
+  });
