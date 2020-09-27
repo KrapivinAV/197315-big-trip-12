@@ -6,8 +6,10 @@ export default class Passages extends Observer {
     this._passages = [];
   }
 
-  setPassages(passages) {
+  setPassages(updateType, passages) {
     this._passages = passages.slice();
+
+    this._notify(updateType);
   }
 
   getPassages() {
@@ -52,5 +54,61 @@ export default class Passages extends Observer {
     ];
 
     this._notify(updateType);
+  }
+
+  static adaptToClient(passage) {
+    const adaptedPassage = Object.assign(
+        {},
+        passage,
+        {
+          waypointType: passage.type,
+          waypoint: passage.destination.name,
+          passageStartPoint: new Date(passage.date_from),
+          passageEndPoint: new Date(passage.date_to),
+          description: passage.destination.description,
+          photos: passage.destination.pictures,
+          price: passage.base_price,
+          isFavorite: passage.is_favorite
+        }
+    );
+
+    delete adaptedPassage.type;
+    delete adaptedPassage.destination;
+    delete adaptedPassage.date_from;
+    delete adaptedPassage.date_to;
+    delete adaptedPassage.base_price;
+    delete adaptedPassage.is_favorite;
+
+    return adaptedPassage;
+  }
+
+  static adaptToServer(passage) {
+    const adaptedPassage = Object.assign(
+        {},
+        passage,
+        {
+          "type": passage.waypointType,
+          "destination": {
+            name: passage.waypoint,
+            description: passage.description,
+            pictures: passage.photos
+          },
+          "date_from": passage.passageStartPoint,
+          "date_to": passage.passageEndPoint,
+          "base_price": passage.price,
+          "is_favorite": passage.isFavorite
+        }
+    );
+
+    delete adaptedPassage.waypointType;
+    delete adaptedPassage.waypoint;
+    delete adaptedPassage.description;
+    delete adaptedPassage.photos;
+    delete adaptedPassage.passageStartPoint;
+    delete adaptedPassage.passageEndPoint;
+    delete adaptedPassage.price;
+    delete adaptedPassage.isFavorite;
+
+    return adaptedPassage;
   }
 }

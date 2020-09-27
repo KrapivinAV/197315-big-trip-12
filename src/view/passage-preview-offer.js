@@ -1,12 +1,12 @@
 import AbstractView from "./abstract.js";
 
 const createPassagePreviewOfferTemplate = (offer) => {
-  const {title, cost} = offer;
+  const {title, price} = offer;
 
   return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;
-    &euro;&nbsp;<span class="event__offer-price">${cost}</span>
+    &euro;&nbsp;<span class="event__offer-price">${price}</span>
   </li>`;
 };
 

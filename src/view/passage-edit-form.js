@@ -173,7 +173,7 @@ const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, of
           <label class="event__offer-label" for="${item.title}" data-waypoint-type="${waypointType}">
             <span class="event__offer-title">${item.title}</span>
             &plus;
-            &euro;&nbsp;<span class="event__offer-price">${item.cost}</span>
+            &euro;&nbsp;<span class="event__offer-price">${item.price}</span>
           </label>
         </div>`).join(``)}
       </div>

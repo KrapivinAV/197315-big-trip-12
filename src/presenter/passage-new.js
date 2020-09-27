@@ -1,5 +1,5 @@
 import PassageEditFormView from "../view/passage-edit-form.js";
-import {generateId} from "../mock/passage.js";
+import {generateId} from "../utils/passage.js";
 import {remove, render, RenderPosition} from "../utils/render.js";
 import {UserAction, UpdateType, FormType} from "../basis-constants.js";
 

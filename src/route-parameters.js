@@ -5,7 +5,7 @@ const QUANTITY_OF_OFFERS_BY_TYPE = 5;
 
 const Set = function (name, index) {
   this.title = `${name}Offer №${index}`;
-  this.cost = index * 10;
+  this.price = index * 10;
 };
 
 const RouteTypeSet = function (name) {

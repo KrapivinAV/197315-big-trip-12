@@ -1,6 +1,7 @@
 import SorterView from "../view/sorter.js";
 import DaysView from "../view/days.js";
 import DayView from "../view/day.js";
+import LoadingView from "../view/loading.js";
 import NoTripView from "../view/no-trip.js";
 import PassagePresenter from "./passage.js";
 import PassageNewPresenter from "./passage-new.js";
@@ -10,7 +11,7 @@ import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
 import {SortType, UpdateType, UserAction} from "../basis-constants.js";
 
 export default class Trip {
-  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode) {
+  constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode, api) {
     this._tripPassagesContainer = tripPassagesContainer;
     this._passagesModel = passagesModel;
     this._filterModel = filterModel;
@@ -20,8 +21,11 @@ export default class Trip {
     this._currentSortType = SortType.DEFAULT;
     this._passagePresenters = {};
     this._dayComponents = [];
+    this._isLoading = true;
+    this.api = api;
 
     this._noTripComponent = new NoTripView();
+    this._loadingComponent = new LoadingView();
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
@@ -113,6 +117,10 @@ export default class Trip {
     this._sorterComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
+  _renderLoading() {
+    render(this._tripPassagesContainer, this._loadingComponent);
+  }
+
   _renderNoTrip() {
     render(this._tripPassagesContainer, this._noTripComponent);
   }
@@ -159,7 +167,9 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_PASSAGE:
-        this._passagesModel.updatePassage(updateType, update);
+        this._api.updatePassage(update).then((response) => {
+          this._passagesModel.updatePassage(updateType, response);
+        });
         break;
       case UserAction.ADD_PASSAGE:
         this._passagesModel.addPassage(updateType, update);
@@ -181,10 +191,20 @@ export default class Trip {
       case UpdateType.MAJOR:
         this._render(true);
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderTripList();
+        break;
     }
   }
 
   _renderTripList() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (!this._passagesModel.getPassages().length) {
       remove(this._sorterComponent);
       this._sorterComponent = null;
@@ -220,6 +240,9 @@ export default class Trip {
       remove(this._daysComponent);
       this._daysComponent = null;
     }
+
+    remove(this._noTripComponent);
+    remove(this._loadingComponent);
 
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;

@@ -21,3 +21,5 @@ export const formatDate = (date, format) => {
 
   return moment(date).format(format);
 };
+
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
