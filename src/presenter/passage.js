@@ -2,18 +2,7 @@ import PassageContainerView from "../view/passage-container.js";
 import PassagePreviewView from "../view/passage-preview.js";
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {render, replace, remove} from "../utils/render.js";
-import {UserAction, UpdateType, FormType} from "../basis-constants.js";
-
-const Mode = {
-  DEFAULT: `DEFAULT`,
-  EDITING: `EDITING`
-};
-
-export const State = {
-  SAVING: `SAVING`,
-  DELETING: `DELETING`,
-  ABORTING: `ABORTING`
-};
+import {UserAction, UpdateType, FormType, Mode, State, EvtKey} from "../basis-constants.js";
 
 export default class Passage {
   constructor(dayList, changeData, changeMode, offersSet, destinationsSet) {
@@ -129,7 +118,7 @@ export default class Passage {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === EvtKey.ESCAPE || evt.key === EvtKey.ESC) {
       evt.preventDefault();
       this._passageEditFormComponent.reset(this._passage);
       this._replaceFormToPreview();

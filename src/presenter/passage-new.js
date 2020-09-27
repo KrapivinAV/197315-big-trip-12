@@ -1,6 +1,6 @@
 import PassageEditFormView from "../view/passage-edit-form.js";
 import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType, FormType} from "../basis-constants.js";
+import {UserAction, UpdateType, FormType, EvtKey} from "../basis-constants.js";
 
 export default class PassageNew {
   constructor(tripPassagesContainer, changeData, offersSet, destinationsSet, deactiveteCreatePassageMode) {
@@ -75,7 +75,7 @@ export default class PassageNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === EvtKey.ESCAPE || evt.key === EvtKey.ESC) {
       evt.preventDefault();
       this.destroy();
     }

@@ -3,12 +3,12 @@ import DaysView from "../view/days.js";
 import DayView from "../view/day.js";
 import LoadingView from "../view/loading.js";
 import NoTripView from "../view/no-trip.js";
-import PassagePresenter, {State as PassagePresenterViewState} from "./passage.js";
+import PassagePresenter from "./passage.js";
 import PassageNewPresenter from "./passage-new.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
-import {SortType, UpdateType, UserAction} from "../basis-constants.js";
+import {SortType, UpdateType, UserAction, State as PassagePresenterViewState} from "../basis-constants.js";
 
 export default class Trip {
   constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode, api) {
