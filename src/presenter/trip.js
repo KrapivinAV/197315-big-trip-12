@@ -8,7 +8,7 @@ import PassageNewPresenter from "./passage-new.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {sortByDate, sortByTime, sortByPrice} from "../utils/passage.js";
-import {SortType, UpdateType, UserAction, State as PassagePresenterViewState} from "../basis-constants.js";
+import {BLANK_DAY, SortType, UpdateType, UserAction, State as PassagePresenterViewState} from "../basis-constants.js";
 
 export default class Trip {
   constructor(tripPassagesContainer, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode, api) {
@@ -69,9 +69,9 @@ export default class Trip {
     this._displayPassagesGroups.clear();
     switch (this._currentSortType) {
       case SortType.TIME_SORT:
-        return this._displayPassagesGroups.set(0, filtredPassages.sort(sortByTime));
+        return this._displayPassagesGroups.set(BLANK_DAY, filtredPassages.sort(sortByTime));
       case SortType.PRICE_SORT:
-        return this._displayPassagesGroups.set(0, filtredPassages.sort(sortByPrice));
+        return this._displayPassagesGroups.set(BLANK_DAY, filtredPassages.sort(sortByPrice));
     }
 
     return this._generateDisplayPassagesGroups(filtredPassages.sort(sortByDate));
@@ -129,7 +129,13 @@ export default class Trip {
     if (!this._daysComponent) {
       this._daysComponent = new DaysView();
       render(this._tripPassagesContainer, this._daysComponent);
-      this._passageNewPresenter = new PassageNewPresenter(this._daysComponent, this._handleViewAction, this._offersModel.getOffers(), this._destinationsModel.getDestinations(), this._deactiveteCreatePassageMode);
+      this._passageNewPresenter = new PassageNewPresenter(
+          this._daysComponent,
+          this._handleViewAction,
+          this._offersModel.getOffers(),
+          this._destinationsModel.getDestinations(),
+          this._deactiveteCreatePassageMode
+      );
     }
   }
 
@@ -152,7 +158,13 @@ export default class Trip {
 
   _renderPassage(item) {
     const dayList = this._dayComponent.getElement().querySelector(`.trip-events__list`);
-    const passagePresenter = new PassagePresenter(dayList, this._handleViewAction, this._handleModeChange, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
+    const passagePresenter = new PassagePresenter(
+        dayList,
+        this._handleViewAction,
+        this._handleModeChange,
+        this._offersModel.getOffers(),
+        this._destinationsModel.getDestinations()
+    );
     passagePresenter.init(item);
     this._passagePresenters[item.id] = passagePresenter;
   }

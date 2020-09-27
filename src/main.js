@@ -1,4 +1,4 @@
-import {remove, render, RenderPosition} from "./utils/render.js";
+import {remove, render} from "./utils/render.js";
 import MainNavView from "./view/main-nav.js";
 import StatisticsView from "./view/statistics.js";
 import TripPresenter from "./presenter/trip.js";
@@ -7,7 +7,7 @@ import PassagesModel from "./model/passages.js";
 import OffersModel from "./model/offers.js";
 import DestinationsModel from "./model/destinations.js";
 import FilterModel from "./model/filter.js";
-import {MenuItem, UpdateType, FilterType} from "./basis-constants.js";
+import {MenuItem, UpdateType, FilterType, RenderPosition} from "./basis-constants.js";
 import Api from "./api.js";
 
 const AUTHORIZATION = `Basic h47d7dh42ka06kv`;
@@ -27,25 +27,25 @@ const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 const filterModel = new FilterModel();
 
-const activateCreatePassageMode = (evt) => {
+const handleAddPassageClick = (evt) => {
   evt.preventDefault();
   remove(statisticsComponent);
   trip.destroy();
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   trip.init();
   mainNavComponent.resetMainNavStatus();
-  addPassageButtonElement.removeEventListener(`click`, activateCreatePassageMode);
+  addPassageButtonElement.removeEventListener(`click`, handleAddPassageClick);
   addPassageButtonElement.disabled = true;
   trip.createPassage();
 };
 
-const deactiveteCreatePassageMode = () => {
-  addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
+const handleAddPassageClose = () => {
+  addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
   addPassageButtonElement.disabled = false;
 };
 
 const filterPresenter = new FilterPresenter(tripControlsElement, filterModel, passagesModel);
-const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, destinationsModel, filterModel, deactiveteCreatePassageMode, api);
+const trip = new TripPresenter(tripPassagesElement, passagesModel, offersModel, destinationsModel, filterModel, handleAddPassageClose, api);
 
 let statisticsComponent = null;
 
@@ -75,7 +75,7 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
 
     mainNavComponent.setMainNavClickHandler(handleMainNavClick);
-    addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
+    addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
   })
   .catch(() => {
     offersModel.setOffers([]);
@@ -85,5 +85,5 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
 
     mainNavComponent.setMainNavClickHandler(handleMainNavClick);
-    addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
+    addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
   });

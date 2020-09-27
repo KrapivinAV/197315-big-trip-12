@@ -1,4 +1,4 @@
-import {basisConstants, typeTranslations} from "../basis-constants.js";
+import {basisConstants, typeTranslations, BLANK_PASSAGE, FIRST_ITEM, MIN_PRICE} from "../basis-constants.js";
 import SmartView from "./smart.js";
 
 import he from "he";
@@ -6,19 +6,8 @@ import flatpickr from "flatpickr";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-const BLANK_PASSAGE = {
-  isFavorite: false,
-  offers: [],
-  passageEndPoint: new Date(),
-  passageStartPoint: new Date(),
-  price: ``,
-  waypoint: ``,
-  waypointType: ``
-};
-
-const {arrivals} = basisConstants;
-
 const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite, formType, destinationTypeSet, isDisabled, isSaving, isDeleting) => {
+  const {arrivals} = basisConstants;
   let routePlaceholderPart = ``;
   let checkedStatus = ``;
   let typeMark = null;
@@ -152,15 +141,15 @@ const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, of
   let typeOffers = null;
 
   if (waypointType !== ``) {
-    typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === waypointType.toLowerCase())[0].offerSet;
+    typeOffers = offersTypes.filter((item) => item.name.toLowerCase() === waypointType.toLowerCase())[FIRST_ITEM].offerSet;
   }
 
   let currentDescription = null;
   let currentPhotos = null;
 
   if (waypoint !== ``) {
-    currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].description;
-    currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[0].pictures;
+    currentDescription = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[FIRST_ITEM].description;
+    currentPhotos = destinationTypes.filter((item) => item.name.toLowerCase() === waypoint.toLowerCase())[FIRST_ITEM].pictures;
   }
 
   return `<section class="event__details">
@@ -267,7 +256,7 @@ export default class PassageEditForm extends SmartView {
     }
 
     if (this.getElement().checkValidity()) {
-      const destination = this._destinationsSet.filter((item) => item.name === this._data.waypoint)[0];
+      const destination = this._destinationsSet.filter((item) => item.name === this._data.waypoint)[FIRST_ITEM];
       this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data, destination));
     }
   }
@@ -358,7 +347,7 @@ export default class PassageEditForm extends SmartView {
   _priceInputHandler(evt) {
     evt.preventDefault();
 
-    const isValid = +evt.target.value === parseInt(evt.target.value, 10) && +evt.target.value >= 0;
+    const isValid = +evt.target.value === parseInt(evt.target.value, 10) && +evt.target.value >= MIN_PRICE;
     const massage = !isValid ? `Введите целое положительное число.` : ``;
 
     evt.target.setCustomValidity(massage);
@@ -376,12 +365,12 @@ export default class PassageEditForm extends SmartView {
   _availableOffersHandler(evt) {
     evt.preventDefault();
     const currentOffersSet = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox:checked`));
-    const typeOffers = this._offersSet.filter((item) => item.name.toLowerCase() === this._data.waypointType.toLowerCase())[0].offerSet;
+    const typeOffers = this._offersSet.filter((item) => item.name.toLowerCase() === this._data.waypointType.toLowerCase())[FIRST_ITEM].offerSet;
 
     this._data.offers = [];
 
     currentOffersSet.forEach((element) => {
-      const currentOffer = typeOffers.filter((item) => item.title === element.name)[0];
+      const currentOffer = typeOffers.filter((item) => item.title === element.name)[FIRST_ITEM];
       this._data.offers.push(currentOffer);
     });
   }

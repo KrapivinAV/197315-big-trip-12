@@ -1,6 +1,6 @@
 import PassageEditFormView from "../view/passage-edit-form.js";
-import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType, FormType, EvtKey} from "../basis-constants.js";
+import {remove, render} from "../utils/render.js";
+import {UserAction, UpdateType, FormType, EvtKey, RenderPosition} from "../basis-constants.js";
 
 export default class PassageNew {
   constructor(tripPassagesContainer, changeData, offersSet, destinationsSet, deactiveteCreatePassageMode) {

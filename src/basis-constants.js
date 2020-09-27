@@ -81,4 +81,40 @@ export const State = {
   ABORTING: `ABORTING`
 };
 
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+  BEFORE: `before`,
+  AFTER: `after`
+};
 
+export const BLANK_PASSAGE = {
+  isFavorite: false,
+  offers: [],
+  passageEndPoint: new Date(),
+  passageStartPoint: new Date(),
+  price: ``,
+  waypoint: ``,
+  waypointType: ``
+};
+
+export const Method = {
+  GET: `GET`,
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
+};
+
+export const SuccessHTTPStatusRange = {
+  MIN: 200,
+  MAX: 299
+};
+
+export const BLANK_DAY = 0;
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+export const SORTER_MODE = 1;
+export const FILTER_DISABLE_VALUE = 0;
+export const FIRST_ITEM = 0;
+export const MIN_PRICE = 0;
+export const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
+export const BAR_HEIGHT = 55;
