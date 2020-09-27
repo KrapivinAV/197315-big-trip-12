@@ -68,13 +68,9 @@ trip.init();
 
 Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
   .then(([points, offers, destinations]) => {
-    console.log(points);
-    console.log(offers);
-    console.log(destinations);
-
+    offersModel.setOffers(offers);
+    destinationsModel.setDestinations(destinations);
     passagesModel.setPassages(UpdateType.INIT, points);
-    offersModel.setOffers(UpdateType.INIT, offers);
-    destinationsModel.setDestinations(UpdateType.INIT, destinations);
 
     render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
 
@@ -82,9 +78,9 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     addPassageButtonElement.addEventListener(`click`, activateCreatePassageMode);
   })
   .catch(() => {
+    offersModel.setOffers([]);
+    destinationsModel.setDestinations([]);
     passagesModel.setPassages(UpdateType.INIT, []);
-    offersModel.setOffers(UpdateType.INIT, []);
-    destinationsModel.setDestinations(UpdateType.INIT, []);
 
     render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
 

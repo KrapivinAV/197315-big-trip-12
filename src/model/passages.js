@@ -88,14 +88,9 @@ export default class Passages extends Observer {
         passage,
         {
           "type": passage.waypointType,
-          "destination": {
-            name: passage.waypoint,
-            description: passage.description,
-            pictures: passage.photos
-          },
           "date_from": passage.passageStartPoint,
           "date_to": passage.passageEndPoint,
-          "base_price": passage.price,
+          "base_price": +passage.price,
           "is_favorite": passage.isFavorite
         }
     );

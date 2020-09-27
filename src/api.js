@@ -1,10 +1,11 @@
 import PassagesModel from "./model/passages.js";
 import OffersModel from "./model/offers.js";
 
-
 const Method = {
   GET: `GET`,
-  PUT: `PUT`
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
 };
 
 const SuccessHTTPStatusRange = {
@@ -60,6 +61,24 @@ export default class Api {
     )
       .then(Api.checkStatus)
       .catch(Api.catchError);
+  }
+
+  addPassage(passage) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(PassagesModel.adaptToServer(passage)),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api.toJSON)
+      .then(PassagesModel.adaptToClient);
+  }
+
+  deletePassage(passage) {
+    return this._load({
+      url: `points/${passage.id}`,
+      method: Method.DELETE
+    });
   }
 
   static checkStatus(response) {

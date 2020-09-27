@@ -1,5 +1,5 @@
 import {basisConstants, typeTranslations} from "../basis-constants.js";
-import {formatDate} from "../utils/passage.js";
+import {formatDate, formatPassageDuration} from "../utils/passage.js";
 import PassagePreviewOfferView from "./passage-preview-offer.js";
 import {render} from "../utils/render.js";
 import AbstractView from "./abstract.js";
@@ -26,7 +26,7 @@ const createPassagePreviewTemplate = (passage) => {
         &mdash;
         <time class="event__end-time" datetime="${passageEndPoint.toISOString()}">${formatDate(passageEndPoint, `hh:mm`)}</time>
       </p>
-      <p class="event__duration">${formatDate(new Date(passageEndPoint - passageStartPoint), `DD[D] hh[H] mm[M]`)}</p>
+      <p class="event__duration">${formatPassageDuration(new Date(passageEndPoint - passageStartPoint))}</p>
     </div>
 
     <p class="event__price">

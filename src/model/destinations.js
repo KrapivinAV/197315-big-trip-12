@@ -3,10 +3,8 @@ export default class Destinations {
     this._destinations = [];
   }
 
-  setDestinations(updateType, destinations) {
+  setDestinations(destinations) {
     this._destinations = destinations.slice();
-
-    this._notify(updateType);
   }
 
   getDestinations() {

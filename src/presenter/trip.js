@@ -3,7 +3,7 @@ import DaysView from "../view/days.js";
 import DayView from "../view/day.js";
 import LoadingView from "../view/loading.js";
 import NoTripView from "../view/no-trip.js";
-import PassagePresenter from "./passage.js";
+import PassagePresenter, {State as PassagePresenterViewState} from "./passage.js";
 import PassageNewPresenter from "./passage-new.js";
 import {render, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
@@ -22,7 +22,7 @@ export default class Trip {
     this._passagePresenters = {};
     this._dayComponents = [];
     this._isLoading = true;
-    this.api = api;
+    this._api = api;
 
     this._noTripComponent = new NoTripView();
     this._loadingComponent = new LoadingView();
@@ -167,15 +167,34 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_PASSAGE:
-        this._api.updatePassage(update).then((response) => {
-          this._passagesModel.updatePassage(updateType, response);
-        });
+        this._passagePresenters[update.id].setViewState(PassagePresenterViewState.SAVING);
+        this._api.updatePassage(update)
+          .then((response) => {
+            this._passagesModel.updatePassage(updateType, response);
+          })
+          .catch(() => {
+            this._passagePresenters[update.id].setViewState(PassagePresenterViewState.ABORTING);
+          });
         break;
       case UserAction.ADD_PASSAGE:
-        this._passagesModel.addPassage(updateType, update);
+        this._passageNewPresenter.setSaving();
+        this._api.addPassage(update)
+          .then((response) => {
+            this._passagesModel.addPassage(updateType, response);
+          })
+          .catch(() => {
+            this._passageNewPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_PASSAGE:
-        this._passagesModel.deletePassage(updateType, update);
+        this._passagePresenters[update.id].setViewState(PassagePresenterViewState.DELETING);
+        this._api.deletePassage(update)
+          .then(() => {
+            this._passagesModel.deletePassage(updateType, update);
+          })
+          .catch(() => {
+            this._passagePresenters[update.id].setViewState(PassagePresenterViewState.ABORTING);
+          });
         break;
     }
   }
@@ -254,4 +273,3 @@ export default class Trip {
     this._renderTripList();
   }
 }
-

@@ -1,4 +1,4 @@
-import {formatDate} from "./passage.js";
+import moment from "moment";
 
 export const generateMoneyByTypes = (passages, arrivals, vehicles) => {
   const types = arrivals.concat(vehicles);
@@ -51,7 +51,7 @@ export const generateSpendTimeByTypes = (passages, arrivals, vehicles) => {
 
     if (currentTypePassages.length !== 0) {
       selectedTypes.push(item);
-      summaryTimes.push(formatDate(new Date(currentTypePassages.map((passage) => passage.passageEndPoint - passage.passageStartPoint).reduce((accumulator, currentValue) => accumulator + currentValue)), `DD`));
+      summaryTimes.push(formatSpendTime(new Date(currentTypePassages.map((passage) => passage.passageEndPoint - passage.passageStartPoint).reduce((accumulator, currentValue) => accumulator + currentValue))));
     }
   });
 
@@ -59,4 +59,8 @@ export const generateSpendTimeByTypes = (passages, arrivals, vehicles) => {
     labels: selectedTypes,
     values: summaryTimes
   };
+};
+
+export const formatSpendTime = (duration) => {
+  return moment.duration(duration).days();
 };
