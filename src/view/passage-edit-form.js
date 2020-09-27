@@ -11,7 +11,7 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
   let routePlaceholderPart = ``;
   let checkedStatus = ``;
   let typeMark = null;
-  let deleteStatus = isDeleting ? `deleting...` : `delete`;
+  const deleteStatus = isDeleting ? `deleting...` : `delete`;
 
   if (waypointType !== ``) {
     routePlaceholderPart = arrivals.some((item) => item.toLowerCase() === waypointType.toLowerCase()) ? `in` : `to`;
