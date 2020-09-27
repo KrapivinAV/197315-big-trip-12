@@ -118,3 +118,5 @@ export const FIRST_ITEM = 0;
 export const MIN_PRICE = 0;
 export const MAX_QUANTITY_OF_OFFERS_IN_PREVIEW = 3;
 export const BAR_HEIGHT = 55;
+export const AUTHORIZATION = `Basic h47d7dh42ka06kv`;
+export const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;

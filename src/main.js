@@ -1,4 +1,5 @@
 import {remove, render} from "./utils/render.js";
+import {MenuItem, UpdateType, FilterType, RenderPosition, AUTHORIZATION, END_POINT} from "./basis-constants.js";
 import MainNavView from "./view/main-nav.js";
 import StatisticsView from "./view/statistics.js";
 import TripPresenter from "./presenter/trip.js";
@@ -7,11 +8,7 @@ import PassagesModel from "./model/passages.js";
 import OffersModel from "./model/offers.js";
 import DestinationsModel from "./model/destinations.js";
 import FilterModel from "./model/filter.js";
-import {MenuItem, UpdateType, FilterType, RenderPosition} from "./basis-constants.js";
 import Api from "./api.js";
-
-const AUTHORIZATION = `Basic h47d7dh42ka06kv`;
-const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const pageBodyContainer = document.querySelector(`.page-main .page-body__container`);
 const addPassageButtonElement = document.querySelector(`.trip-main__event-add-btn`);
