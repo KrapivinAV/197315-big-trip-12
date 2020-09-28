@@ -60,6 +60,10 @@ const handleMainNavClick = (menuItem) => {
   }
 };
 
+addPassageButtonElement.disabled = true;
+
+render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
+
 filterPresenter.init();
 trip.init();
 
@@ -68,8 +72,7 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     offersModel.setOffers(offers);
     destinationsModel.setDestinations(destinations);
     passagesModel.setPassages(UpdateType.INIT, points);
-
-    render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
+    addPassageButtonElement.disabled = false;
 
     mainNavComponent.setMainNavClickHandler(handleMainNavClick);
     addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
@@ -78,8 +81,7 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     offersModel.setOffers([]);
     destinationsModel.setDestinations([]);
     passagesModel.setPassages(UpdateType.INIT, []);
-
-    render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
+    addPassageButtonElement.disabled = false;
 
     mainNavComponent.setMainNavClickHandler(handleMainNavClick);
     addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
