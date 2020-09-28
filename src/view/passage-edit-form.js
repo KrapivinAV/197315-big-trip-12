@@ -1,4 +1,4 @@
-import {basisConstants, typeTranslations, BLANK_PASSAGE, FIRST_ITEM, MIN_PRICE} from "../basis-constants.js";
+import {basisConstants, typeTranslations, WaypointType, FormType, BLANK_PASSAGE, FIRST_ITEM, MIN_PRICE} from "../basis-constants.js";
 import SmartView from "./smart.js";
 
 import he from "he";
@@ -6,7 +6,7 @@ import flatpickr from "flatpickr";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite, formType, destinationTypeSet, isDisabled, isSaving, isDeleting) => {
+const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFavorite, formType, destinationTypeSet, isDisabled, isSaving, isDeleting, currentWaypointType) => {
   const {arrivals} = basisConstants;
   let routePlaceholderPart = ``;
   let checkedStatus = ``;
@@ -32,37 +32,37 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
           <legend class="visually-hidden">Transfer</legend>
 
           <div class="event__type-item">
-            <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+            <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${currentWaypointType === WaypointType.TAXI ? `checked` : ``}>
             <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
+            <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${currentWaypointType === WaypointType.BUS ? `checked` : ``}>
             <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+            <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${currentWaypointType === WaypointType.TRAIN ? `checked` : ``}>
             <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+            <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${currentWaypointType === WaypointType.SHIP ? `checked` : ``}>
             <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+            <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport" ${currentWaypointType === WaypointType.TRANSPORT ? `checked` : ``}>
             <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+            <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${currentWaypointType === WaypointType.DRIVE ? `checked` : ``}>
             <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
+            <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${currentWaypointType === WaypointType.FLIGHT ? `checked` : ``}>
             <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
           </div>
         </fieldset>
@@ -71,17 +71,17 @@ const createPassageEditFormHeaderTemplate = (waypointType, waypoint, price, isFa
           <legend class="visually-hidden">Activity</legend>
 
           <div class="event__type-item">
-            <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+            <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${currentWaypointType === WaypointType.CHECK_IN ? `checked` : ``}>
             <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+            <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${currentWaypointType === WaypointType.SIGHTSEEING ? `checked` : ``}>
             <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
           </div>
 
           <div class="event__type-item">
-            <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+            <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${currentWaypointType === WaypointType.RESTAURANT ? `checked` : ``}>
             <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
           </div>
         </fieldset>
@@ -180,10 +180,10 @@ const createPassageEditFormDetailsTemplate = (waypointType, waypoint, offers, of
   </section>`;
 };
 
-const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet, formType) => {
+const createPassageEditFormTemplate = (data, offersTypeSet, destinationTypeSet, formType, currentWaypointType) => {
   const {waypointType, waypoint, price, isFavorite, offers, isDisabled, isSaving, isDeleting} = data;
 
-  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite, formType, destinationTypeSet, isDisabled, isSaving, isDeleting);
+  const headerTemplate = createPassageEditFormHeaderTemplate(waypointType, waypoint, price, isFavorite, formType, destinationTypeSet, isDisabled, isSaving, isDeleting, currentWaypointType);
   const detailTemplate = createPassageEditFormDetailsTemplate(waypointType, waypoint, offers, offersTypeSet, destinationTypeSet);
 
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -203,6 +203,7 @@ export default class PassageEditForm extends SmartView {
     this._data = PassageEditForm.parsePassageToData(passage);
     this._startDatepicker = null;
     this._endDatepicker = null;
+    this._currentWaypointType = formType === FormType.EDIT_PASSAGE ? this._data.waypointType : WaypointType.BUS;
 
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -240,33 +241,21 @@ export default class PassageEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet, this._formType);
-  }
-
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  }
-
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-
-    if (this._data.waypointType === ``) {
-      this._data.waypointType = `bus`;
-    }
-
-    if (this.getElement().checkValidity()) {
-      const destination = this._destinationsSet.filter((item) => item.name === this._data.waypoint)[FIRST_ITEM];
-      this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data, destination));
-    }
+    return createPassageEditFormTemplate(this._data, this._offersSet, this._destinationsSet, this._formType, this._currentWaypointType);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this._setStartDatepicker();
     this._setEndDatepicker();
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   _setStartDatepicker() {
@@ -306,24 +295,6 @@ export default class PassageEditForm extends SmartView {
 
   }
 
-  _startDateChangeHandler([userDate]) {
-    const isValid = this._data.passageEndPoint > userDate;
-    this._data.passageEndPoint = isValid ? this._data.passageEndPoint : userDate;
-
-    this.updateData({
-      passageStartPoint: userDate
-    });
-  }
-
-  _endDateChangeHandler([userDate]) {
-    const isValid = this._data.passageStartPoint < userDate;
-    this._data.passageStartPoint = isValid ? this._data.passageStartPoint : userDate;
-
-    this.updateData({
-      passageEndPoint: userDate
-    });
-  }
-
   _setInnerHandlers() {
     this.getElement()
     .querySelector(`.event__type-list`)
@@ -342,6 +313,42 @@ export default class PassageEditForm extends SmartView {
         item.addEventListener(`change`, this._availableOffersHandler);
       });
     }
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+
+    if (this._data.waypointType === ``) {
+      this._data.waypointType = `bus`;
+    }
+
+    if (this.getElement().checkValidity()) {
+      const destination = this._destinationsSet.filter((item) => item.name === this._data.waypoint)[FIRST_ITEM];
+      this._callback.formSubmit(PassageEditForm.parseDataToPassage(this._data, destination));
+    }
+  }
+
+  _startDateChangeHandler([userDate]) {
+    const isValid = this._data.passageEndPoint > userDate;
+    this._data.passageEndPoint = isValid ? this._data.passageEndPoint : userDate;
+
+    this.updateData({
+      passageStartPoint: userDate
+    });
+  }
+
+  _endDateChangeHandler([userDate]) {
+    const isValid = this._data.passageStartPoint < userDate;
+    this._data.passageStartPoint = isValid ? this._data.passageStartPoint : userDate;
+
+    this.updateData({
+      passageEndPoint: userDate
+    });
   }
 
   _priceInputHandler(evt) {
@@ -387,6 +394,7 @@ export default class PassageEditForm extends SmartView {
 
   _waypointTypeChangeHandler(evt) {
     evt.preventDefault();
+    this._currentWaypointType = evt.target.value;
     this._data.offers = [];
     this.updateData({
       waypointType: evt.target.value
@@ -413,11 +421,6 @@ export default class PassageEditForm extends SmartView {
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(PassageEditForm.parseDataToPassage(this._data));
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   static parsePassageToData(passage) {

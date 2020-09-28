@@ -110,6 +110,19 @@ export const SuccessHTTPStatusRange = {
   MAX: 299
 };
 
+export const WaypointType = {
+  TAXI: `taxi`,
+  BUS: `bus`,
+  TRAIN: `train`,
+  SHIP: `ship`,
+  TRANSPORT: `transport`,
+  DRIVE: `drive`,
+  FLIGHT: `flight`,
+  CHECK_IN: `check-in`,
+  SIGHTSEEING: `sightseeing`,
+  RESTAURANT: `restaurant`
+};
+
 export const BLANK_DAY = 0;
 export const SHAKE_ANIMATION_TIMEOUT = 600;
 export const SORTER_MODE = 1;

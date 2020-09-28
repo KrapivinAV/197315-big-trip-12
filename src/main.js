@@ -64,6 +64,8 @@ addPassageButtonElement.disabled = true;
 
 render(tripControlsFirstHeaderElement, mainNavComponent, RenderPosition.AFTER);
 
+mainNavComponent.setMainNavToDisabledMode();
+
 filterPresenter.init();
 trip.init();
 
@@ -73,6 +75,7 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     destinationsModel.setDestinations(destinations);
     passagesModel.setPassages(UpdateType.INIT, points);
     addPassageButtonElement.disabled = false;
+    mainNavComponent.setMainNavToDefaultMode();
 
     mainNavComponent.setMainNavClickHandler(handleMainNavClick);
     addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
@@ -82,6 +85,7 @@ Promise.all([api.getPassages(), api.getOffers(), api.getDestinations()])
     destinationsModel.setDestinations([]);
     passagesModel.setPassages(UpdateType.INIT, []);
     addPassageButtonElement.disabled = false;
+    mainNavComponent.setMainNavToDefaultMode();
 
     mainNavComponent.setMainNavClickHandler(handleMainNavClick);
     addPassageButtonElement.addEventListener(`click`, handleAddPassageClick);
